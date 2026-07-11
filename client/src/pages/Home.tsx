@@ -292,6 +292,63 @@ export default function Home() {
         </div>
       </section>
 
+      {/* How It Works */}
+      <section className="py-20 bg-slate-50">
+        <div className="container">
+          <div className="text-center mb-14">
+            <span className="inline-block bg-[#1e3a5f]/10 text-[#1e3a5f] text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
+              How It Works
+            </span>
+            <h2 className="text-3xl font-bold font-serif mb-3">Up and running in three steps</h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+              SponsorBridge is designed to be simple to set up and powerful to operate — no technical expertise required.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto relative">
+            <div className="hidden md:block absolute top-10 left-[calc(16.67%+1rem)] right-[calc(16.67%+1rem)] h-0.5 bg-gradient-to-r from-[#1e3a5f]/20 via-[#1e3a5f]/40 to-[#1e3a5f]/20" />
+            {([
+              {
+                step: "01",
+                emoji: "🏢",
+                title: "Set up your organisation",
+                description: "Create your account, configure your branding, and add your team members with the right roles and permissions in minutes.",
+              },
+              {
+                step: "02",
+                emoji: "👧",
+                title: "Add children and match sponsors",
+                description: "Upload child profiles with photos, education and health records. Our two-way matching engine connects sponsors with the right child based on preferences.",
+              },
+              {
+                step: "03",
+                emoji: "📊",
+                title: "Track impact and retain sponsors",
+                description: "Sponsors receive automated updates, vlogs, and personalised impact reports. Built-in analytics and NPS surveys help you identify and act on churn risk early.",
+              },
+            ] as const).map((item, i) => (
+              <div key={i} className="relative bg-white rounded-2xl p-8 shadow-sm border border-slate-100 flex flex-col items-center text-center hover:shadow-md transition-shadow duration-200">
+                <div className="w-16 h-16 rounded-2xl bg-[#1e3a5f] flex items-center justify-center text-2xl mb-5 shadow-md">
+                  {item.emoji}
+                </div>
+                <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-[#c8a96e] flex items-center justify-center text-white text-xs font-bold shadow">
+                  {item.step}
+                </div>
+                <h3 className="text-lg font-bold text-[#1e3a5f] mb-3">{item.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{item.description}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <Link href="/register">
+              <Button className="bg-[#1e3a5f] hover:bg-[#16304f] text-white font-semibold px-8 py-3 h-auto rounded-xl">
+                Get started free
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Comparison table */}
       <section className="py-20 bg-white">
         <div className="container">

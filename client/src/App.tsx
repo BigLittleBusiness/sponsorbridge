@@ -15,6 +15,8 @@ import PricingPage from "./pages/PricingPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import LoginPage from "./pages/auth/LoginPage";
 import VerifyOtpPage from "./pages/auth/VerifyOtpPage";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 // Org dashboard & onboarding
 import OrgDashboard from "./pages/OrgDashboard";
@@ -61,6 +63,9 @@ import ConsentManager from "./pages/safeguarding/ConsentManager";
 // Community
 import CommunityPage from "./pages/community/CommunityPage";
 
+// System Admin
+import SystemAdminDashboard from "./pages/admin/SystemAdminDashboard";
+
 // Settings
 import TenantSettings from "./pages/settings/TenantSettings";
 import UserManagement from "./pages/settings/UserManagement";
@@ -77,6 +82,8 @@ function Router() {
       <Route path="/register" component={RegisterPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/verify-otp" component={VerifyOtpPage} />
+      <Route path="/forgot-password" component={ForgotPasswordPage} />
+      <Route path="/reset-password" component={ResetPasswordPage} />
 
       {/* Post-auth flows */}
       <Route path="/onboarding" component={OnboardingChecklist} />
@@ -120,6 +127,9 @@ function Router() {
 
       {/* Community & Ambassador */}
       <Route path="/community" component={CommunityPage} />
+
+      {/* System Admin */}
+      <Route path="/admin" component={SystemAdminDashboard} />
 
       {/* Settings */}
       <Route path="/settings/tenant" component={TenantSettings} />

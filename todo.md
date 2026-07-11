@@ -161,3 +161,29 @@
 - [x] ECS Fargate, Aurora MySQL Serverless v2, SES, ElastiCache Redis architecture documented
 - [x] Environment variable documentation for AWS deployment
 - [x] Security hardening checklist (GuardDuty, CloudTrail, WAF, KMS, VPC)
+
+## Phase 22: System Admin Dashboard (Full SaaS Management)
+- [ ] System Admin page with tabbed sections (/admin/system)
+- [ ] Email / SES configuration tab (SMTP host, port, from address, API key, test send)
+- [ ] Stripe configuration tab (publishable key, secret key, webhook secret, test mode toggle)
+- [ ] Tenant management tab (list all tenants, suspend/activate, view usage)
+- [ ] Platform billing tab (MRR, ARR, churn rate, revenue by tier, subscription list)
+- [ ] System health tab (DB status, storage usage, email queue, error rate, uptime)
+- [ ] Feature flags tab (per-tenant and global feature toggles)
+- [ ] Audit log viewer tab (immutable log with filters)
+- [ ] Notification broadcast tab (platform-wide announcements)
+- [ ] Security tab (active sessions, failed logins, IP allowlist, 2FA enforcement)
+
+## Phase 23: Forgot Password Flow
+- [ ] Forgot password page (/forgot-password)
+- [ ] POST /api/auth/forgot-password endpoint (generate reset token, send email)
+- [ ] Reset password page (/reset-password?token=xxx)
+- [ ] POST /api/auth/reset-password endpoint (validate token, update password hash)
+- [ ] Reset token stored in DB with 1-hour expiry
+- [ ] Login page "Forgot password?" link wired to /forgot-password
+
+## Phase 24: Homepage How It Works + Onboarding Progress Bar
+- [ ] "How it works" three-step section on homepage above comparison table
+- [ ] Animated step cards: Add children → Match sponsors → Track impact
+- [ ] Onboarding checklist visual progress bar (% complete, colour-coded)
+- [ ] Progress bar updates dynamically as steps are checked off

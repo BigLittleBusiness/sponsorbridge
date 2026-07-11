@@ -423,6 +423,46 @@ export const referrals = mysqlTable("referrals", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+// ─── PLATFORM SETTINGS (System Admin config) ────────────────────────────────
+export const platformSettings = mysqlTable("platform_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  settingKey: varchar("setting_key", { length: 128 }).notNull().unique(),
+  settingValue: text("setting_value"),
+  category: varchar("category", { length: 64 }).notNull(), // email, stripe, security, platform
+  isSecret: boolean("is_secret").default(false).notNull(),
+  updatedBy: int("updated_by"),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PlatformSetting = typeof platformSettings.$inferSelect;
+export type InsertPlatformSetting = typeof platformSettings.$inferInsert;
+
+// ─── FEATURE FLAGS ────────────────────────────────────────────────────────────
+export const featureFlags = mysqlTable("feature_flags", {
+  id: int("id").autoincrement().primaryKey(),
+  flagKey: varchar("flag_key", { length: 128 }).notNull(),
+  tenantId: int("tenant_id"), // null = global flag
+  enabled: boolean("enabled").default(false).notNull(),
+  description: text("description"),
+  updatedBy: int("updated_by"),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FeatureFlag = typeof featureFlags.$inferSelect;
+export type InsertFeatureFlag = typeof featureFlags.$inferInsert;
+
+// ─── PASSWORD RESET TOKENS ────────────────────────────────────────────────────
+export const passwordResetTokens = mysqlTable("password_reset_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  accountId: int("account_id").notNull().references(() => customAccounts.id),
+  token: varchar("token", { length: 128 }).notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+
 // ─── EXPORTS ──────────────────────────────────────────────────────────────────
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = typeof tenants.$inferInsert;

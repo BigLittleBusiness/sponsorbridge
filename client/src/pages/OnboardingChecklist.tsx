@@ -315,21 +315,72 @@ export default function OnboardingChecklist() {
         </div>
 
         {/* Progress */}
-        <Card className="border-border shadow-sm mb-6">
-          <CardContent className="pt-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-[#1a2e1a]">Setup progress</span>
-              <span className="text-sm font-bold text-brand-red">
-                {completedCount} / {totalCount} completed
-              </span>
-            </div>
-            <Progress value={progressPct} className="h-2.5" />
-            {allDone && (
-              <div className="flex items-center gap-2 mt-3 text-green-700 text-sm font-medium">
-                <CheckCircle2 className="w-4 h-4" />
-                All steps complete — you're ready to go!
+        <Card className={`border-border shadow-sm mb-6 overflow-hidden ${allDone ? "border-green-300" : ""}`}>
+          <CardContent className="pt-5 pb-5">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <span className="text-sm font-semibold text-[#1a2e1a]">
+                  {allDone ? "✅ Setup complete!" : "Setup progress"}
+                </span>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {allDone
+                    ? "Your organisation is ready to manage child sponsorships."
+                    : `${totalCount - completedCount} step${totalCount - completedCount !== 1 ? "s" : ""} remaining to go live`}
+                </p>
               </div>
-            )}
+              <div className="text-right shrink-0 ml-4">
+                <span className={`text-4xl font-bold tabular-nums leading-none ${
+                  allDone ? "text-green-600" : progressPct >= 60 ? "text-[#1e3a5f]" : "text-[#c8a96e]"
+                }`}>
+                  {progressPct}%
+                </span>
+                <p className="text-xs text-muted-foreground mt-0.5">{completedCount} of {totalCount} steps</p>
+              </div>
+            </div>
+            {/* Main progress bar */}
+            <div className="relative w-full h-5 bg-slate-100 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ease-out ${
+                  allDone
+                    ? "bg-green-500"
+                    : progressPct >= 66
+                    ? "bg-[#1e3a5f]"
+                    : progressPct >= 33
+                    ? "bg-[#c8a96e]"
+                    : "bg-terracotta"
+                }`}
+                style={{ width: `${progressPct}%` }}
+              />
+              {/* Milestone tick marks */}
+              {[33, 66].map((pct) => (
+                <div
+                  key={pct}
+                  className="absolute top-0 bottom-0 w-px bg-white/60"
+                  style={{ left: `${pct}%` }}
+                />
+              ))}
+            </div>
+            {/* Per-section mini progress */}
+            <div className="mt-4 grid grid-cols-5 gap-2">
+              {sections.map((section) => {
+                const done = section.items.filter((i) => i.completed).length;
+                const total = section.items.length;
+                const pct = Math.round((done / total) * 100);
+                return (
+                  <div key={section.id} className="text-center">
+                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mb-1">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          pct === 100 ? "bg-green-500" : "bg-[#c8a96e]"
+                        }`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] text-muted-foreground leading-none">{done}/{total}</span>
+                  </div>
+                );
+              })}
+            </div>
           </CardContent>
         </Card>
 

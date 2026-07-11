@@ -7,6 +7,7 @@ import { nanoid } from "nanoid";
 import { eq, and, count } from "drizzle-orm";
 import { getDb } from "./db";
 import { referrals } from "../drizzle/schema";
+import { sysAdminRouter } from "./routers/sysAdmin";
 import {
   acknowledgePolicy,
   appendAuditLog,
@@ -729,5 +730,6 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+  sysAdmin: sysAdminRouter,
 });
 export type AppRouter = typeof appRouter;

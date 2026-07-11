@@ -10,7 +10,8 @@ import { SignJWT, jwtVerify } from "jose";
 import nodemailer from "nodemailer";
 import { z } from "zod";
 import { getDb } from "./db";
-import { customAccounts, onboardingProgress, tenants } from "../drizzle/schema";
+import { nanoid } from "nanoid";
+import { customAccounts, onboardingProgress, tenants, passwordResetTokens } from "../drizzle/schema";
 
 const router = Router();
 
@@ -490,6 +491,112 @@ router.post("/complete-onboarding", async (req, res) => {
     .where(eq(customAccounts.id, payload.accountId));
 
   return res.json({ success: true });
+});
+
+// ─── Forgot Password ────────────────────────────────────────────────────────
+
+/** POST /api/auth/forgot-password */
+router.post("/forgot-password", async (req, res) => {
+  const parse = z.object({ email: z.string().email() }).safeParse(req.body);
+  if (!parse.success) return res.status(400).json({ error: "Valid email required" });
+
+  const db = await getDb();
+  if (!db) return res.status(503).json({ error: "Database unavailable" });
+
+  // Always return success to prevent email enumeration
+  const [account] = await db.select().from(customAccounts)
+    .where(eq(customAccounts.email, parse.data.email)).limit(1);
+
+  if (account && account.isVerified) {
+    // Generate a secure token
+    const token = nanoid(48);
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await db.insert(passwordResetTokens).values({
+      accountId: account.id,
+      token,
+      expiresAt,
+    });
+
+    const resetUrl = `${req.headers.origin ?? "https://sponsorbridge.com"}/reset-password?token=${token}`;
+    const transport = getMailTransport();
+    const fromName = process.env.EMAIL_FROM_NAME ?? "SponsorBridge";
+    const fromEmail = process.env.EMAIL_FROM ?? "noreply@sponsorbridge.com";
+
+    try {
+      await transport.sendMail({
+        from: `"${fromName}" <${fromEmail}>`,
+        to: account.email,
+        subject: "Reset your SponsorBridge password",
+        html: `
+          <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+            <h2 style="color:#1e3a5f">Reset your password</h2>
+            <p>Hi ${account.firstName},</p>
+            <p>We received a request to reset the password for your SponsorBridge account associated with <strong>${account.email}</strong>.</p>
+            <p>Click the button below to choose a new password. This link expires in <strong>1 hour</strong>.</p>
+            <a href="${resetUrl}" style="display:inline-block;background:#1e3a5f;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;margin:16px 0">Reset Password</a>
+            <p style="color:#666;font-size:13px">If you didn't request this, you can safely ignore this email. Your password won't change.</p>
+            <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+            <p style="color:#999;font-size:12px">SponsorBridge — Empowering child sponsorship organisations worldwide.</p>
+          </div>
+        `,
+      });
+    } catch (err) {
+      console.error("[Auth] Failed to send password reset email:", err);
+    }
+  }
+
+  // Always return success to prevent email enumeration
+  return res.json({ success: true });
+});
+
+/** POST /api/auth/reset-password */
+router.post("/reset-password", async (req, res) => {
+  const parse = z.object({
+    token: z.string().min(1),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+  }).safeParse(req.body);
+  if (!parse.success) return res.status(400).json({ error: parse.error.issues[0]?.message ?? "Invalid request" });
+
+  const db = await getDb();
+  if (!db) return res.status(503).json({ error: "Database unavailable" });
+
+  const [resetToken] = await db.select().from(passwordResetTokens)
+    .where(eq(passwordResetTokens.token, parse.data.token)).limit(1);
+
+  if (!resetToken) return res.status(400).json({ error: "Invalid or expired reset link" });
+  if (resetToken.usedAt) return res.status(400).json({ error: "This reset link has already been used" });
+  if (new Date() > resetToken.expiresAt) return res.status(400).json({ error: "This reset link has expired. Please request a new one." });
+
+  const passwordHash = await bcrypt.hash(parse.data.password, 12);
+
+  await db.update(customAccounts)
+    .set({ passwordHash })
+    .where(eq(customAccounts.id, resetToken.accountId));
+
+  // Mark token as used
+  await db.update(passwordResetTokens)
+    .set({ usedAt: new Date() })
+    .where(eq(passwordResetTokens.id, resetToken.id));
+
+  return res.json({ success: true });
+});
+
+/** GET /api/auth/validate-reset-token */
+router.get("/validate-reset-token", async (req, res) => {
+  const token = req.query.token as string;
+  if (!token) return res.status(400).json({ valid: false, error: "Token required" });
+
+  const db = await getDb();
+  if (!db) return res.status(503).json({ valid: false });
+
+  const [resetToken] = await db.select().from(passwordResetTokens)
+    .where(eq(passwordResetTokens.token, token)).limit(1);
+
+  if (!resetToken || resetToken.usedAt || new Date() > resetToken.expiresAt) {
+    return res.json({ valid: false });
+  }
+  return res.json({ valid: true });
 });
 
 export { router as customAuthRouter };
