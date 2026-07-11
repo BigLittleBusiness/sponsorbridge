@@ -54,6 +54,7 @@ import {
   updateSponsorship,
   updateTenant,
   updateUserRole,
+  getSponsorImpactData,
 } from "./db";
 import { TRPCError } from "@trpc/server";
 
@@ -659,6 +660,12 @@ export const appRouter = router({
       .query(async ({ ctx, input }) => {
         requireRole(ctx.user.role, [...MANAGER_ROLES, "sponsor_relations", "finance_officer"]);
         return getDashboardStats(input.tenantId);
+      }),
+    sponsorImpact: protectedProcedure
+      .input(z.object({ sponsorId: z.number(), tenantId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, [...STAFF_ROLES]);
+        return getSponsorImpactData(input.sponsorId, input.tenantId);
       }),
   }),
 

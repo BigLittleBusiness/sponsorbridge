@@ -115,3 +115,49 @@
 - [x] Safeguarding escalation tests
 - [x] All 27 tests passing
 - [x] Final checkpoint and deliver
+
+## Phase 16: Custom Auth System (Registration + OTP)
+- [x] Add custom_accounts table (email, password hash, OTP, verified flag, org details)
+- [x] Add DB migration for custom_accounts
+- [x] Registration API endpoint (POST /api/auth/register) with validation
+- [x] OTP generation and email send on registration
+- [x] OTP verification endpoint (POST /api/auth/verify-otp)
+- [x] Custom JWT login endpoint (POST /api/auth/login)
+- [x] Registration page (multi-step: org info → OTP verification)
+- [x] Login page with email/password form
+- [x] Remove Manus OAuth dependency from public-facing registration flow
+- [x] Post-login routing: charity admins → org dashboard, sponsors → sponsor dashboard
+
+## Phase 17: Marketing Site Improvements
+- [x] Remove all Manus mentions from landing page and footer
+- [x] Add "Create Account" and "Sign In" to top navigation
+- [x] Update all "Get Started" CTAs to open registration flow (not Manus OAuth)
+- [x] Add pricing page (/pricing) with tiers and inclusions
+- [x] Add pricing link to top navigation
+
+## Phase 18: Marketing Imagery
+- [x] Generate hero image (child in village, warm golden light)
+- [x] Generate feature section image (sponsor reading letter while watching child's video on tablet)
+- [x] Generate platform screenshot mockup image (SponsorBridge dashboard on MacBook)
+- [x] Integrate all images into landing page at appropriate locations
+
+## Phase 19: Onboarding Checklist & Org Dashboard
+- [x] Interactive onboarding checklist page for new charity admins
+- [x] Checklist steps: org profile, first child record, invite team member, review safeguarding policy, set up payment
+- [x] Checklist progress persisted in localStorage (DB-backed via markOnboardingComplete)
+- [x] Post-login routing logic: incomplete onboarding → checklist, complete → org dashboard
+- [x] Org dashboard page (distinct from system admin dashboard)
+
+## Phase 20: Sponsor Impact Dashboard
+- [x] Sponsor impact dashboard page (/sponsors/:id/impact)
+- [x] Donation history chart (monthly giving over time, recharts)
+- [x] Community benefit metrics (children helped, total community impact)
+- [x] Child personal updates feed (vlogs + messages)
+- [x] Cumulative impact statistics with 4 KPI cards
+
+## Phase 21: AWS Production Readiness
+- [x] Document AWS deployment architecture (docs/aws-deployment-architecture.md)
+- [x] Two-bucket S3 strategy (public assets + private child media with pre-signed URLs)
+- [x] ECS Fargate, Aurora MySQL Serverless v2, SES, ElastiCache Redis architecture documented
+- [x] Environment variable documentation for AWS deployment
+- [x] Security hardening checklist (GuardDuty, CloudTrail, WAF, KMS, VPC)

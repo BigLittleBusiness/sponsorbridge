@@ -372,6 +372,45 @@ export const notifications = mysqlTable("notifications", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+// ─── CUSTOM AUTH ACCOUNTS ───────────────────────────────────────────────────
+export const customAccounts = mysqlTable("custom_accounts", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").references(() => tenants.id),
+  // Organisation details
+  orgName: varchar("orgName", { length: 255 }).notNull(),
+  orgCountry: varchar("orgCountry", { length: 100 }).notNull(),
+  orgWebsite: varchar("orgWebsite", { length: 255 }),
+  orgSize: varchar("orgSize", { length: 50 }), // e.g. "1-10", "11-50", "51-200", "200+"
+  // Contact person
+  firstName: varchar("firstName", { length: 100 }).notNull(),
+  lastName: varchar("lastName", { length: 100 }).notNull(),
+  jobTitle: varchar("jobTitle", { length: 150 }),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  phone: varchar("phone", { length: 30 }),
+  // Auth
+  passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
+  isVerified: boolean("isVerified").default(false).notNull(),
+  otpCode: varchar("otpCode", { length: 6 }),
+  otpExpiresAt: timestamp("otpExpiresAt"),
+  otpAttempts: int("otpAttempts").default(0),
+  // Plan
+  planTier: mysqlEnum("planTier", ["starter", "growth", "professional", "enterprise"]).default("starter"),
+  // Onboarding
+  onboardingCompletedAt: timestamp("onboardingCompletedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  lastSignedIn: timestamp("lastSignedIn"),
+});
+
+// ─── ONBOARDING CHECKLIST ───────────────────────────────────────────────────
+export const onboardingProgress = mysqlTable("onboarding_progress", {
+  id: int("id").autoincrement().primaryKey(),
+  accountId: int("accountId").notNull().references(() => customAccounts.id),
+  stepKey: varchar("stepKey", { length: 100 }).notNull(), // e.g. "org_profile", "first_child", "invite_team", "safeguarding", "payment"
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 // ─── REFERRALS & AMBASSADOR PROGRAM ─────────────────────────────────────────
 export const referrals = mysqlTable("referrals", {
   id: int("id").autoincrement().primaryKey(),

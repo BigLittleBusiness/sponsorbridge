@@ -564,3 +564,101 @@ export async function getDashboardStats(tenantId: number) {
     totalRevenueCents: revenueResult[0]?.total ?? 0,
   };
 }
+
+// ─── SPONSOR IMPACT DATA ──────────────────────────────────────────────────────
+
+export async function getSponsorImpactData(sponsorId: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  // All sponsorships for this sponsor
+  const sponsorshipList = await db.select().from(sponsorships)
+    .where(and(eq(sponsorships.sponsorId, sponsorId), eq(sponsorships.tenantId, tenantId)));
+
+  // Payment history (succeeded payments)
+  const paymentHistory = await db.select({
+    id: payments.id,
+    amount: payments.amount,
+    currency: payments.currency,
+    status: payments.status,
+    paidAt: payments.paidAt,
+    createdAt: payments.createdAt,
+    sponsorshipId: payments.sponsorshipId,
+  }).from(payments)
+    .where(and(
+      eq(payments.sponsorId, sponsorId),
+      eq(payments.tenantId, tenantId),
+      eq(payments.status, "succeeded"),
+    ))
+    .orderBy(payments.createdAt);
+
+  // Total lifetime giving in cents
+  const totalCents = paymentHistory.reduce((sum, p) => sum + (p.amount ?? 0), 0);
+
+  // Monthly aggregation for chart (last 12 months)
+  const now = new Date();
+  const monthlyData: { month: string; amount: number }[] = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const label = d.toLocaleString("default", { month: "short", year: "2-digit" });
+    const monthTotal = paymentHistory
+      .filter(p => {
+        const pd = p.paidAt ?? p.createdAt;
+        return pd.getFullYear() === d.getFullYear() && pd.getMonth() === d.getMonth();
+      })
+      .reduce((sum, p) => sum + (p.amount ?? 0), 0);
+    monthlyData.push({ month: label, amount: Math.round(monthTotal / 100) });
+  }
+
+  // Approved vlogs for this sponsor (via their sponsorships)
+  const sponsorshipIds = sponsorshipList.map(s => s.id);
+  const vlogFeed = sponsorshipIds.length > 0
+    ? await db.select({
+        id: vlogs.id,
+        title: vlogs.title,
+        description: vlogs.description,
+        videoUrl: vlogs.videoUrl,
+        thumbnailUrl: vlogs.thumbnailUrl,
+        direction: vlogs.direction,
+        createdAt: vlogs.createdAt,
+        childId: vlogs.childId,
+        sponsorshipId: vlogs.sponsorshipId,
+      }).from(vlogs)
+        .where(and(eq(vlogs.tenantId, tenantId), eq(vlogs.status, "approved")))
+        .orderBy(desc(vlogs.createdAt))
+        .limit(10)
+    : [];
+
+  // Approved messages for this sponsor's sponsorships
+  const messageFeed = sponsorshipIds.length > 0
+    ? await db.select({
+        id: messages.id,
+        originalText: messages.originalText,
+        translatedText: messages.translatedText,
+        direction: messages.direction,
+        createdAt: messages.createdAt,
+        sponsorshipId: messages.sponsorshipId,
+      }).from(messages)
+        .where(and(eq(messages.tenantId, tenantId), eq(messages.status, "approved")))
+        .orderBy(desc(messages.createdAt))
+        .limit(10)
+    : [];
+
+  // Community impact stats
+  const [communityChildren] = await db.select({ count: sql<number>`count(*)` })
+    .from(children).where(and(eq(children.tenantId, tenantId), eq(children.status, "SPONSORED")));
+  const [communitySponsors] = await db.select({ count: sql<number>`count(*)` })
+    .from(sponsors).where(eq(sponsors.tenantId, tenantId));
+
+  return {
+    sponsorships: sponsorshipList,
+    paymentHistory,
+    monthlyData,
+    totalLifetimeCents: totalCents,
+    totalPayments: paymentHistory.length,
+    vlogFeed,
+    messageFeed,
+    communityChildrenSponsored: communityChildren?.count ?? 0,
+    communityTotalSponsors: communitySponsors?.count ?? 0,
+  };
+}

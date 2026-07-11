@@ -4,12 +4,23 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { CustomAuthProvider } from "./contexts/CustomAuthContext";
 
 // Public pages
 import Home from "./pages/Home";
 import PolicyAck from "./pages/PolicyAck";
+import PricingPage from "./pages/PricingPage";
 
-// Dashboard shell
+// Custom auth pages
+import RegisterPage from "./pages/auth/RegisterPage";
+import LoginPage from "./pages/auth/LoginPage";
+import VerifyOtpPage from "./pages/auth/VerifyOtpPage";
+
+// Org dashboard & onboarding
+import OrgDashboard from "./pages/OrgDashboard";
+import OnboardingChecklist from "./pages/OnboardingChecklist";
+
+// Dashboard shell (internal staff)
 import Dashboard from "./pages/Dashboard";
 
 // Children
@@ -37,6 +48,9 @@ import PaymentsPage from "./pages/payments/PaymentsPage";
 // Analytics
 import AnalyticsDashboard from "./pages/analytics/AnalyticsDashboard";
 
+// Sponsor impact dashboard
+import SponsorImpactDashboard from "./pages/sponsors/SponsorImpactDashboard";
+
 // Safeguarding
 import IncidentsList from "./pages/safeguarding/IncidentsList";
 import IncidentDetail from "./pages/safeguarding/IncidentDetail";
@@ -54,11 +68,21 @@ import UserManagement from "./pages/settings/UserManagement";
 function Router() {
   return (
     <Switch>
-      {/* Public */}
+      {/* Public marketing */}
       <Route path="/" component={Home} />
+      <Route path="/pricing" component={PricingPage} />
       <Route path="/policy" component={PolicyAck} />
 
-      {/* Dashboard */}
+      {/* Custom auth */}
+      <Route path="/register" component={RegisterPage} />
+      <Route path="/login" component={LoginPage} />
+      <Route path="/verify-otp" component={VerifyOtpPage} />
+
+      {/* Post-auth flows */}
+      <Route path="/onboarding" component={OnboardingChecklist} />
+      <Route path="/org-dashboard" component={OrgDashboard} />
+
+      {/* Internal staff dashboard */}
       <Route path="/dashboard" component={Dashboard} />
 
       {/* Children */}
@@ -68,6 +92,7 @@ function Router() {
 
       {/* Sponsors */}
       <Route path="/sponsors" component={SponsorsList} />
+      <Route path="/sponsors/:id/impact" component={SponsorImpactDashboard} />
       <Route path="/sponsors/:id" component={SponsorDetail} />
 
       {/* Matching */}
@@ -110,10 +135,12 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <CustomAuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </CustomAuthProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

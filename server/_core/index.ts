@@ -10,6 +10,8 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { onboardingHeartbeatHandler } from "../scheduled/onboarding";
 import { registerStripeRoutes } from "../stripe";
+import { customAuthRouter } from "../customAuth";
+import cookieParser from "cookie-parser";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -40,8 +42,12 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  app.use(cookieParser());
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+
+  // Custom auth routes (registration, OTP, login for charity admins)
+  app.use("/api/auth", customAuthRouter);
 
   // Scheduled heartbeat handlers — must be before Vite/static fallthrough
   app.post("/api/scheduled/onboarding", onboardingHeartbeatHandler);
