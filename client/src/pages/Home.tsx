@@ -92,15 +92,25 @@ const STATS = [
   { value: "GDPR", label: "& COPPA Compliant" },
 ];
 
-const COMPARISON = [
-  { feature: "Child profile management", large: true, small: false },
-  { feature: "Automated sponsor onboarding", large: true, small: false },
-  { feature: "Moderated vlog system", large: true, small: false },
-  { feature: "Safeguarding incident management", large: true, small: false },
-  { feature: "Retention analytics & NPS surveys", large: true, small: false },
-  { feature: "White-label branding", large: true, small: false },
-  { feature: "Multi-language communications", large: true, small: false },
-  { feature: "Immutable audit trail", large: true, small: false },
+// Research-accurate comparison:
+// Large orgs (World Vision, Compassion, Plan International) genuinely have:
+//   child selector/browse, sponsor app, auto-translated correspondence, trust badges, community impact stats
+// Large orgs do NOT have (confirmed by research):
+//   moderated vlogs, NPS/CSAT surveys, RBAC with defined roles, incident management, immutable audit trail,
+//   white-label multi-tenancy, churn prediction, or 90-day structured onboarding sequences
+const COMPARISON: { feature: string; large: boolean; small: boolean; note?: string }[] = [
+  { feature: "Child profile browse & selector", large: true, small: false },
+  { feature: "Sponsor app with giving history", large: true, small: false },
+  { feature: "Auto-translated correspondence", large: true, small: false },
+  { feature: "Community impact statistics", large: true, small: false },
+  { feature: "Structured 90-day onboarding sequence", large: false, small: false, note: "Built in-house at enormous cost" },
+  { feature: "Moderated vlog system", large: false, small: false },
+  { feature: "Role-based access control (7 roles)", large: false, small: false },
+  { feature: "Safeguarding incident management", large: false, small: false },
+  { feature: "Retention analytics & NPS surveys", large: false, small: false },
+  { feature: "White-label multi-tenancy", large: false, small: false },
+  { feature: "Immutable audit trail", large: false, small: false },
+  { feature: "Churn prediction & re-engagement", large: false, small: false },
 ];
 
 export default function Home() {
@@ -299,9 +309,10 @@ export default function Home() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 font-semibold text-foreground">Feature</th>
+                  <th className="text-left py-3 px-4 font-semibold text-foreground w-1/2">Feature</th>
                   <th className="text-center py-3 px-4 font-semibold text-foreground">
-                    Large organisations
+                    Large orgs
+                    <div className="text-xs font-normal text-muted-foreground">(World Vision, Compassion)</div>
                   </th>
                   <th className="text-center py-3 px-4 font-semibold text-foreground">
                     Without SponsorBridge
@@ -317,11 +328,20 @@ export default function Home() {
                     key={row.feature}
                     className={`border-b border-border ${i % 2 === 0 ? "bg-warm-linen/30" : ""}`}
                   >
-                    <td className="py-3 px-4 text-foreground">{row.feature}</td>
-                    <td className="py-3 px-4 text-center">
-                      <CheckCircle2 className="w-4 h-4 text-green-600 mx-auto" />
+                    <td className="py-3 px-4 text-foreground">
+                      <span>{row.feature}</span>
+                      {row.note && (
+                        <span className="block text-xs text-muted-foreground mt-0.5 italic">{row.note}</span>
+                      )}
                     </td>
-                    <td className="py-3 px-4 text-center text-muted-foreground text-xs">
+                    <td className="py-3 px-4 text-center">
+                      {row.large ? (
+                        <CheckCircle2 className="w-4 h-4 text-green-600 mx-auto" />
+                      ) : (
+                        <span className="text-muted-foreground/40 text-lg leading-none">✗</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-center text-muted-foreground/40 text-lg leading-none">
                       ✗
                     </td>
                     <td className="py-3 px-4 text-center">
@@ -331,6 +351,9 @@ export default function Home() {
                 ))}
               </tbody>
             </table>
+            <p className="text-xs text-muted-foreground mt-4 text-center">
+              Based on published features of World Vision, Compassion International, and Plan International as of 2025.
+            </p>
           </div>
         </div>
       </section>
