@@ -372,6 +372,18 @@ export const notifications = mysqlTable("notifications", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+// ─── REFERRALS & AMBASSADOR PROGRAM ─────────────────────────────────────────
+export const referrals = mysqlTable("referrals", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").references(() => tenants.id),
+  referrerId: int("referrerId").notNull().references(() => users.id), // user who shared the link
+  referredUserId: int("referredUserId").references(() => users.id),   // user who signed up via link
+  referralCode: varchar("referralCode", { length: 32 }).notNull().unique(),
+  status: mysqlEnum("status", ["pending", "converted", "expired"]).default("pending").notNull(),
+  convertedAt: timestamp("convertedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 // ─── EXPORTS ──────────────────────────────────────────────────────────────────
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = typeof tenants.$inferInsert;

@@ -25,6 +25,7 @@ import {
   LogOut,
   MessageSquare,
   Settings,
+  Share2,
   Shield,
   ShieldCheck,
   Users,
@@ -53,6 +54,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Messages", href: "/messages", icon: MessageSquare, roles: ["system_admin", "program_manager", "safeguarding_officer", "sponsor_relations", "admin"] },
   { label: "Payments", href: "/payments", icon: Wallet, roles: ["system_admin", "finance_officer", "program_manager", "admin"] },
   { label: "Analytics", href: "/analytics", icon: BarChart3, roles: ["system_admin", "program_manager", "sponsor_relations", "finance_officer", "admin"] },
+  { label: "Community", href: "/community", icon: Share2 },
 ];
 
 const SAFEGUARDING_ITEMS: NavItem[] = [

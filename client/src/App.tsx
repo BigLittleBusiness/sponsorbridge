@@ -44,6 +44,9 @@ import AuditLog from "./pages/safeguarding/AuditLog";
 import BackgroundChecks from "./pages/safeguarding/BackgroundChecks";
 import ConsentManager from "./pages/safeguarding/ConsentManager";
 
+// Community
+import CommunityPage from "./pages/community/CommunityPage";
+
 // Settings
 import TenantSettings from "./pages/settings/TenantSettings";
 import UserManagement from "./pages/settings/UserManagement";
@@ -89,6 +92,9 @@ function Router() {
       <Route path="/safeguarding/audit" component={AuditLog} />
       <Route path="/safeguarding/background-checks" component={BackgroundChecks} />
       <Route path="/safeguarding/consent" component={ConsentManager} />
+
+      {/* Community & Ambassador */}
+      <Route path="/community" component={CommunityPage} />
 
       {/* Settings */}
       <Route path="/settings/tenant" component={TenantSettings} />

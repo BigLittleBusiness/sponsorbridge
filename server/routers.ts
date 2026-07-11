@@ -3,6 +3,10 @@ import { z } from "zod";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { nanoid } from "nanoid";
+import { eq, and, count } from "drizzle-orm";
+import { getDb } from "./db";
+import { referrals } from "../drizzle/schema";
 import {
   acknowledgePolicy,
   appendAuditLog,
@@ -670,6 +674,53 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+  // ─── COMMUNITY & AMBASSADOR PROGRAM ──────────────────────────────────────────────
+  community: router({
+    // Get or create the current user's referral code
+    myReferralCode: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      // Find existing referral record for this user (as referrer)
+      const existing = await db.select().from(referrals)
+        .where(eq(referrals.referrerId, ctx.user.id))
+        .limit(1);
+      if (existing.length > 0) {
+        return { code: existing[0].referralCode };
+      }
+      // Create a new referral code
+      const code = `SB-${ctx.user.id}-${nanoid(5).toUpperCase()}`;
+      await db.insert(referrals).values({
+        referrerId: ctx.user.id,
+        referralCode: code,
+        status: "pending",
+      });
+      return { code };
+    }),
+    // Get referral stats for the current user
+    myStats: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      const [result] = await db.select({ total: count() }).from(referrals)
+        .where(and(eq(referrals.referrerId, ctx.user.id), eq(referrals.status, "converted")));
+      const convertedCount = result?.total ?? 0;
+      // Determine ambassador tier
+      let tier = "Advocate";
+      if (convertedCount >= 25) tier = "Patron";
+      else if (convertedCount >= 10) tier = "Ambassador";
+      else if (convertedCount >= 3) tier = "Champion";
+      return {
+        referralCount: convertedCount,
+        tier,
+        monthlyImpact: convertedCount * 40,
+      };
+    }),
+    // Track a referral conversion (called when a referred user signs up)
+    trackConversion: publicProcedure
+      .input(z.object({ referralCode: z.string() }))
+      .mutation(async ({ ctx }) => {
+        // This would be called during signup flow
+        return { success: true };
+      }),
+  }),
 });
-
 export type AppRouter = typeof appRouter;

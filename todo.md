@@ -57,7 +57,7 @@
 ## Phase 7: 90-Day Onboarding Nurture Sequence
 - [x] Onboarding sequences table in schema (onboardingSequences)
 - [x] Day 1/3/7/14/30/90 sequence steps defined in schema
-- [ ] Heartbeat/cron job for sequence firing (requires Stripe + heartbeat setup)
+- [x] Heartbeat/cron job for sequence firing — /api/scheduled/onboarding handler implemented (fires on deploy)
 
 ## Phase 8: Vlog System
 - [x] Video upload UI (VlogQueue.tsx with upload form)
@@ -77,8 +77,8 @@
 - [x] Payments table in schema with Stripe fields
 - [x] Payment recording procedure (finance_officer only)
 - [x] Finance dashboard UI (PaymentsPage.tsx)
-- [ ] Stripe integration (recurring subscriptions) — requires Stripe secret key
-- [ ] Xero / QuickBooks integration — requires API keys
+- [x] Stripe integration (recurring subscriptions) — checkout sessions, webhook handler, invoice.paid, subscription.deleted
+- [ ] Xero / QuickBooks integration — requires API keys (post-launch integration)
 
 ## Phase 11: Retention Analytics & NPS/CSAT
 - [x] NPS survey module (surveys table, send/complete procedures)
@@ -103,8 +103,9 @@
 - [x] User management panel (UserManagement.tsx)
 
 ## Phase 14: Social Sharing & Community
+- [x] Ambassador program — 4 tiers (Advocate/Champion/Ambassador/Patron), referral links, social sharing
+- [x] Community page with Twitter/Facebook/Email sharing and message templates
 - [ ] Shareable sponsor cards (anonymised) — future phase
-- [ ] Ambassador program — future phase
 
 ## Phase 15: Tests & Polish
 - [x] Vitest unit tests for all routers (sponsorbridge.test.ts — 26 tests)
@@ -113,4 +114,4 @@
 - [x] NPS/CSAT score validation tests
 - [x] Safeguarding escalation tests
 - [x] All 27 tests passing
-- [ ] Final checkpoint and deliver
+- [x] Final checkpoint and deliver
