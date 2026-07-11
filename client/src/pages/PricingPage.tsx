@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Heart, Check, X, ArrowRight, Users, Baby, Video, Shield,
+  Check, X, ArrowRight, Users, Baby, Video, Shield,
   Globe, BookOpen, Zap, Building2, HelpCircle
 } from "lucide-react";
 import { useCustomAuth } from "@/contexts/CustomAuthContext";
@@ -184,9 +184,11 @@ export default function PricingPage() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/">
             <span className="flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 rounded-lg bg-brand-red flex items-center justify-center">
-                <Heart className="w-4 h-4 text-white fill-white" />
-              </div>
+              <img
+                src="/manus-storage/sb-icon-mark_d802f749.png"
+                alt="SponsorBridge"
+                className="w-8 h-8 rounded-lg object-contain"
+              />
               <span className="text-white font-bold text-lg">SponsorBridge</span>
             </span>
           </Link>
@@ -405,9 +407,11 @@ export default function PricingPage() {
       <footer className="bg-[#1a2e1a] border-t border-white/10 py-8 px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-brand-red flex items-center justify-center">
-              <Heart className="w-3 h-3 text-white fill-white" />
-            </div>
+            <img
+              src="/manus-storage/sb-icon-mark_d802f749.png"
+              alt="SponsorBridge"
+              className="w-6 h-6 rounded object-contain"
+            />
             <span className="text-white/60 text-sm">© {new Date().getFullYear()} SponsorBridge. All rights reserved.</span>
           </div>
           <div className="flex items-center gap-6">

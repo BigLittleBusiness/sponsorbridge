@@ -193,9 +193,11 @@ export default function RegisterPage() {
       <div className="hidden lg:flex lg:w-2/5 bg-[#1a2e1a] flex-col justify-between p-12">
         <Link href="/">
           <span className="flex items-center gap-2 cursor-pointer">
-            <div className="w-8 h-8 rounded-lg bg-brand-red flex items-center justify-center">
-              <Heart className="w-4 h-4 text-white fill-white" />
-            </div>
+            <img
+              src="/manus-storage/sb-icon-mark_d802f749.png"
+              alt="SponsorBridge"
+              className="w-8 h-8 rounded-lg object-contain"
+            />
             <span className="text-white font-bold text-xl">SponsorBridge</span>
           </span>
         </Link>

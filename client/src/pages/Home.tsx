@@ -5,7 +5,6 @@ import {
   ArrowRight,
   BarChart3,
   CheckCircle2,
-  Heart,
   MessageSquare,
   Shield,
   ShieldCheck,
@@ -122,9 +121,11 @@ export default function Home() {
       <nav className="bg-midnight-slate/95 backdrop-blur-sm sticky top-0 z-50 border-b border-white/10">
         <div className="container flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg gradient-brand flex items-center justify-center">
-              <Heart className="w-4 h-4 text-white fill-white" />
-            </div>
+            <img
+              src="/manus-storage/sb-icon-mark_d802f749.png"
+              alt="SponsorBridge"
+              className="w-8 h-8 rounded-lg object-contain"
+            />
             <span className="font-bold text-white text-lg">SponsorBridge</span>
           </div>
           <div className="hidden md:flex items-center gap-6">
@@ -600,9 +601,11 @@ export default function Home() {
       <footer className="bg-midnight-slate border-t border-white/10 text-white/50 py-8 text-sm">
         <div className="container flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-terracotta flex items-center justify-center">
-              <Heart className="w-3 h-3 text-white fill-white" />
-            </div>
+            <img
+              src="/manus-storage/sb-icon-mark_d802f749.png"
+              alt="SponsorBridge"
+              className="w-6 h-6 rounded object-contain"
+            />
             <span>SponsorBridge — The platform that empowers child sponsorship charities.</span>
           </div>
           <div className="flex items-center gap-6">

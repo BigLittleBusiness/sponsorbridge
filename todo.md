@@ -163,27 +163,48 @@
 - [x] Security hardening checklist (GuardDuty, CloudTrail, WAF, KMS, VPC)
 
 ## Phase 22: System Admin Dashboard (Full SaaS Management)
-- [ ] System Admin page with tabbed sections (/admin/system)
-- [ ] Email / SES configuration tab (SMTP host, port, from address, API key, test send)
-- [ ] Stripe configuration tab (publishable key, secret key, webhook secret, test mode toggle)
-- [ ] Tenant management tab (list all tenants, suspend/activate, view usage)
-- [ ] Platform billing tab (MRR, ARR, churn rate, revenue by tier, subscription list)
-- [ ] System health tab (DB status, storage usage, email queue, error rate, uptime)
-- [ ] Feature flags tab (per-tenant and global feature toggles)
-- [ ] Audit log viewer tab (immutable log with filters)
-- [ ] Notification broadcast tab (platform-wide announcements)
-- [ ] Security tab (active sessions, failed logins, IP allowlist, 2FA enforcement)
+- [x] System Admin page with tabbed sections (/admin route)
+- [x] Email / SES configuration tab (SMTP host, port, from address, API key, test send)
+- [x] Stripe configuration tab (publishable key, secret key, webhook secret, test mode toggle)
+- [x] Tenant management tab (list all tenants, suspend/activate, view usage)
+- [x] Platform billing tab (MRR, ARR, churn rate, revenue by tier, subscription list)
+- [x] System health tab (DB status, storage usage, email queue, error rate, uptime)
+- [x] Feature flags tab (per-tenant and global feature toggles)
+- [x] Audit log viewer tab (immutable log with filters)
+- [x] Notification broadcast tab (platform-wide announcements)
+- [x] Security tab (active sessions, failed logins, IP allowlist, 2FA enforcement)
 
 ## Phase 23: Forgot Password Flow
-- [ ] Forgot password page (/forgot-password)
-- [ ] POST /api/auth/forgot-password endpoint (generate reset token, send email)
-- [ ] Reset password page (/reset-password?token=xxx)
-- [ ] POST /api/auth/reset-password endpoint (validate token, update password hash)
-- [ ] Reset token stored in DB with 1-hour expiry
-- [ ] Login page "Forgot password?" link wired to /forgot-password
+- [x] Forgot password page (/forgot-password)
+- [x] POST /api/auth/forgot-password endpoint (generate reset token, send email)
+- [x] Reset password page (/reset-password?token=xxx)
+- [x] POST /api/auth/reset-password endpoint (validate token, update password hash)
+- [x] Reset token stored in DB with 1-hour expiry (password_reset_tokens table)
+- [x] Login page "Forgot password?" link wired to /forgot-password
 
 ## Phase 24: Homepage How It Works + Onboarding Progress Bar
-- [ ] "How it works" three-step section on homepage above comparison table
-- [ ] Animated step cards: Add children → Match sponsors → Track impact
-- [ ] Onboarding checklist visual progress bar (% complete, colour-coded)
-- [ ] Progress bar updates dynamically as steps are checked off
+- [x] "How it works" three-step section on homepage above comparison table
+- [x] Animated step cards: Add children → Match sponsors → Track impact
+- [x] Onboarding checklist visual progress bar (% complete, colour-coded, animated fill)
+- [x] Progress bar updates dynamically as steps are checked off (per-section mini bars + main bar)
+
+## Phase 25: Logo Suite Generation & Integration
+- [x] Generate standalone icon mark (SB arch/bridge monogram, transparent background)
+- [x] Generate horizontal header logo — dark background version
+- [x] Generate horizontal header logo — light background version
+- [x] Generate square favicon/app icon (dark background, bold SB mark)
+- [x] Generate footer logo — dark background version
+- [x] Generate footer logo — light background version
+- [x] Replace placeholder logo in SponsorBridgeLayout.tsx sidebar header
+- [x] Replace placeholder logo in Home.tsx navigation header
+- [x] Replace placeholder logo in Home.tsx footer
+- [x] Replace placeholder logo in PricingPage.tsx navigation header
+- [x] Replace placeholder logo in PricingPage.tsx footer
+- [x] Replace placeholder logo in LoginPage.tsx (left panel + mobile header)
+- [x] Replace placeholder logo in RegisterPage.tsx left panel
+- [x] Replace placeholder logo in VerifyOtpPage.tsx header
+- [x] Replace placeholder logo in ForgotPasswordPage.tsx header
+- [x] Replace placeholder logo in ResetPasswordPage.tsx header
+- [x] Add logo img tag to OTP email template in customAuth.ts
+- [x] Add logo img tag to password reset email template in customAuth.ts
+- [x] Add favicon link tag to client/index.html

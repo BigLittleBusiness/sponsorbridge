@@ -54,9 +54,11 @@ export default function VerifyOtpPage() {
     <div className="min-h-screen bg-[#f7f7f5] flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-border p-8">
         <div className="flex items-center gap-2 mb-8">
-          <div className="w-8 h-8 rounded-lg bg-brand-red flex items-center justify-center">
-            <Heart className="w-4 h-4 text-white fill-white" />
-          </div>
+          <img
+            src="/manus-storage/sb-icon-mark_d802f749.png"
+            alt="SponsorBridge"
+            className="w-8 h-8 rounded-lg object-contain"
+          />
           <span className="font-bold text-xl">SponsorBridge</span>
         </div>
 

@@ -90,9 +90,11 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-2/5 bg-[#1a2e1a] flex-col justify-between p-12">
         <Link href="/">
           <span className="flex items-center gap-2 cursor-pointer">
-            <div className="w-8 h-8 rounded-lg bg-brand-red flex items-center justify-center">
-              <Heart className="w-4 h-4 text-white fill-white" />
-            </div>
+            <img
+              src="/manus-storage/sb-icon-mark_d802f749.png"
+              alt="SponsorBridge"
+              className="w-8 h-8 rounded-lg object-contain"
+            />
             <span className="text-white font-bold text-xl">SponsorBridge</span>
           </span>
         </Link>
@@ -111,9 +113,11 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 rounded-lg bg-brand-red flex items-center justify-center">
-              <Heart className="w-4 h-4 text-white fill-white" />
-            </div>
+            <img
+              src="/manus-storage/sb-icon-mark_d802f749.png"
+              alt="SponsorBridge"
+              className="w-8 h-8 rounded-lg object-contain"
+            />
             <span className="font-bold text-xl">SponsorBridge</span>
           </div>
 

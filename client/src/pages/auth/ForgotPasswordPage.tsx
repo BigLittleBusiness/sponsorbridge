@@ -43,9 +43,11 @@ export default function ForgotPasswordPage() {
         <div className="text-center mb-8">
           <Link href="/">
             <div className="inline-flex items-center gap-2 cursor-pointer">
-              <div className="w-10 h-10 rounded-xl bg-[#1e3a5f] flex items-center justify-center">
-                <Heart className="w-5 h-5 text-white fill-white" />
-              </div>
+              <img
+                src="/manus-storage/sb-icon-mark_d802f749.png"
+                alt="SponsorBridge"
+                className="w-10 h-10 rounded-xl object-contain"
+              />
               <span className="text-2xl font-bold text-[#1e3a5f]">SponsorBridge</span>
             </div>
           </Link>

@@ -140,9 +140,12 @@ function Sidebar({ onClose, userRole }: { onClose?: () => void; userRole?: strin
       <div className="flex items-center justify-between px-4 py-5 border-b border-white/10">
         <Link href="/dashboard">
           <div className="flex items-center gap-2 cursor-pointer">
-            <div className="w-8 h-8 rounded-lg gradient-brand flex items-center justify-center">
-              <Heart className="w-4 h-4 text-white" />
-            </div>
+            <img
+              src="/manus-storage/sb-icon-mark_d802f749.png"
+              alt="SponsorBridge"
+              className="w-8 h-8 rounded-lg object-contain"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+            />
             <div>
               <div className="font-bold text-sm leading-tight">SponsorBridge</div>
               <div className="text-xs text-white/50 leading-tight">Charity Platform</div>
@@ -244,9 +247,11 @@ export default function SponsorBridgeLayout({ children }: { children: React.Reac
     return (
       <div className="min-h-screen bg-warm-linen flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 rounded-xl gradient-brand flex items-center justify-center animate-pulse">
-            <Heart className="w-5 h-5 text-white" />
-          </div>
+          <img
+            src="/manus-storage/sb-icon-mark_d802f749.png"
+            alt="SponsorBridge"
+            className="w-10 h-10 rounded-xl object-contain animate-pulse"
+          />
           <div className="text-sm text-muted-foreground">Loading SponsorBridge…</div>
         </div>
       </div>
@@ -257,9 +262,11 @@ export default function SponsorBridgeLayout({ children }: { children: React.Reac
     return (
       <div className="min-h-screen bg-warm-linen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl gradient-brand flex items-center justify-center mx-auto mb-4">
-            <Heart className="w-8 h-8 text-white" />
-          </div>
+          <img
+            src="/manus-storage/sb-icon-mark_d802f749.png"
+            alt="SponsorBridge"
+            className="w-16 h-16 rounded-2xl object-contain mx-auto mb-4"
+          />
           <h2 className="text-xl font-semibold mb-2">Sign in to SponsorBridge</h2>
           <p className="text-muted-foreground mb-6 text-sm">Access your charity's sponsorship platform</p>
           <Button onClick={() => startLogin()} className="bg-terracotta hover:bg-terracotta/90 text-white">
