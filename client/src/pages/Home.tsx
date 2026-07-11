@@ -345,7 +345,7 @@ export default function Home() {
                       ✗
                     </td>
                     <td className="py-3 px-4 text-center">
-                      <CheckCircle2 className="w-4 h-4 text-terracotta mx-auto" />
+                      <CheckCircle2 className="w-4 h-4 text-green-600 mx-auto" />
                     </td>
                   </tr>
                 ))}
