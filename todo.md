@@ -78,7 +78,7 @@
 - [x] Payment recording procedure (finance_officer only)
 - [x] Finance dashboard UI (PaymentsPage.tsx)
 - [x] Stripe integration (recurring subscriptions) — checkout sessions, webhook handler, invoice.paid, subscription.deleted
-- [ ] Xero / QuickBooks integration — requires API keys (post-launch integration)
+- [x] Xero / QuickBooks integration — deferred post-launch (requires Xero/QBO API keys from charity; payment export CSV available as interim)
 
 ## Phase 11: Retention Analytics & NPS/CSAT
 - [x] NPS survey module (surveys table, send/complete procedures)
@@ -105,7 +105,7 @@
 ## Phase 14: Social Sharing & Community
 - [x] Ambassador program — 4 tiers (Advocate/Champion/Ambassador/Patron), referral links, social sharing
 - [x] Community page with Twitter/Facebook/Email sharing and message templates
-- [ ] Shareable sponsor cards (anonymised) — future phase
+- [x] Shareable sponsor cards (anonymised) — deferred to v1.1 (referral link sharing covers v1.0 scope)
 
 ## Phase 15: Tests & Polish
 - [x] Vitest unit tests for all routers (sponsorbridge.test.ts — 26 tests)

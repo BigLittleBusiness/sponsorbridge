@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { DollarSign, Wallet } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DollarSign, Download, Wallet } from "lucide-react";
 import { useState } from "react";
 
 const DEMO_TENANT_ID = 1;
@@ -21,6 +22,27 @@ export default function PaymentsPage() {
   const total = payments?.filter((p) => p.status === "succeeded").reduce((s, p) => s + p.amount, 0) ?? 0;
   const fmt = (cents: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 
+  const handleExportCSV = () => {
+    if (!payments || payments.length === 0) return;
+    const headers = ["ID", "Date", "Amount (USD)", "Status", "Sponsorship ID", "Stripe Payment Intent"];
+    const rows = payments.map((p) => [
+      p.id,
+      new Date(p.createdAt).toISOString().split("T")[0],
+      (p.amount / 100).toFixed(2),
+      p.status,
+      p.sponsorshipId ?? "",
+      p.stripePaymentIntentId ?? "",
+    ]);
+    const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `sponsorbridge-payments-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <SponsorBridgeLayout>
       <div className="p-6 animate-in-up">
@@ -29,6 +51,11 @@ export default function PaymentsPage() {
             <h1 className="text-2xl font-bold flex items-center gap-2"><Wallet className="w-6 h-6 text-sage" />Payments</h1>
             <p className="text-muted-foreground text-sm mt-1">{payments?.length ?? 0} transactions</p>
           </div>
+          <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={!payments || payments.length === 0}>
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </Button>
           <Select value={status} onValueChange={setStatus}>
             <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -40,6 +67,7 @@ export default function PaymentsPage() {
               <SelectItem value="disputed">Disputed</SelectItem>
             </SelectContent>
           </Select>
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-6">
