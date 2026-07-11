@@ -363,8 +363,8 @@ export default function Home() {
         <div className="grid md:grid-cols-2 min-h-[400px]">
           <div className="relative">
             <img
-              src="/manus-storage/sponsor-reading_aa7aa71f.jpg"
-              alt="A sponsor reading a letter from their sponsored child while watching a video update"
+              src="/manus-storage/sponsor-watching_2407f809.jpg"
+              alt="A sponsor watching a video update from their sponsored child on a tablet"
               className="w-full h-full object-cover"
               style={{ minHeight: 360 }}
             />
