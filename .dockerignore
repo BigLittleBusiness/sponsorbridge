@@ -1,0 +1,9 @@
+node_modules
+.manus-logs
+.git
+.github
+*.md
+dist
+.env
+.env.*
+coverage
