@@ -194,7 +194,7 @@ export default function RegisterPage() {
         <Link href="/">
           <span className="flex items-center gap-2 cursor-pointer">
             <img
-              src="/manus-storage/sb-icon-mark_d802f749.png"
+              src="/manus-storage/sb-icon-mark-v2_6799b40d.png"
               alt="SponsorBridge"
               className="w-8 h-8 rounded-lg object-contain"
             />

@@ -122,7 +122,7 @@ export default function Home() {
         <div className="container flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
             <img
-              src="/manus-storage/sb-icon-mark_d802f749.png"
+              src="/manus-storage/sb-icon-mark-v2_6799b40d.png"
               alt="SponsorBridge"
               className="w-8 h-8 rounded-lg object-contain"
             />
@@ -602,7 +602,7 @@ export default function Home() {
         <div className="container flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <img
-              src="/manus-storage/sb-icon-mark_d802f749.png"
+              src="/manus-storage/sb-icon-mark-v2_6799b40d.png"
               alt="SponsorBridge"
               className="w-6 h-6 rounded object-contain"
             />
