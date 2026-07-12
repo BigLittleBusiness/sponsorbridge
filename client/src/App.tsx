@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
+import { useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CustomAuthProvider } from "./contexts/CustomAuthContext";
@@ -70,9 +71,19 @@ import SystemAdminDashboard from "./pages/admin/SystemAdminDashboard";
 import TenantSettings from "./pages/settings/TenantSettings";
 import UserManagement from "./pages/settings/UserManagement";
 
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [location]);
+  return null;
+}
+
 function Router() {
   return (
-    <Switch>
+    <>
+      <ScrollToTop />
+      <Switch>
       {/* Public marketing */}
       <Route path="/" component={Home} />
       <Route path="/pricing" component={PricingPage} />
@@ -137,7 +148,8 @@ function Router() {
 
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
-    </Switch>
+      </Switch>
+    </>
   );
 }
 
