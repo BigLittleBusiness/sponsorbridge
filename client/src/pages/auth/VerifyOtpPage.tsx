@@ -55,7 +55,7 @@ export default function VerifyOtpPage() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-border p-8">
         <div className="flex items-center gap-2 mb-8">
           <img
-            src="/manus-storage/sb-icon-mark-v2_6799b40d.png"
+            src="/manus-storage/sb-icon-mark_f15604c9.svg"
             alt="SponsorBridge"
             className="w-8 h-8 rounded-lg object-contain"
           />

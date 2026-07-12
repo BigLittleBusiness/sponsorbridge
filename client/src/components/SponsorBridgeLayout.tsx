@@ -141,7 +141,7 @@ function Sidebar({ onClose, userRole }: { onClose?: () => void; userRole?: strin
         <Link href="/dashboard">
           <div className="flex items-center gap-2 cursor-pointer">
             <img
-              src="/manus-storage/sb-icon-mark-v2_6799b40d.png"
+              src="/manus-storage/sb-icon-mark_f15604c9.svg"
               alt="SponsorBridge"
               className="w-8 h-8 rounded-lg object-contain"
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
@@ -248,7 +248,7 @@ export default function SponsorBridgeLayout({ children }: { children: React.Reac
       <div className="min-h-screen bg-warm-linen flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <img
-            src="/manus-storage/sb-icon-mark-v2_6799b40d.png"
+            src="/manus-storage/sb-icon-mark_f15604c9.svg"
             alt="SponsorBridge"
             className="w-10 h-10 rounded-xl object-contain animate-pulse"
           />
@@ -263,7 +263,7 @@ export default function SponsorBridgeLayout({ children }: { children: React.Reac
       <div className="min-h-screen bg-warm-linen flex items-center justify-center">
         <div className="text-center">
           <img
-            src="/manus-storage/sb-icon-mark-v2_6799b40d.png"
+            src="/manus-storage/sb-icon-mark_f15604c9.svg"
             alt="SponsorBridge"
             className="w-16 h-16 rounded-2xl object-contain mx-auto mb-4"
           />

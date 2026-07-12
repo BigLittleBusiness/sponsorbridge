@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
           <Link href="/">
             <div className="inline-flex items-center gap-2 cursor-pointer">
               <img
-                src="/manus-storage/sb-icon-mark-v2_6799b40d.png"
+                src="/manus-storage/sb-icon-mark_f15604c9.svg"
                 alt="SponsorBridge"
                 className="w-10 h-10 rounded-xl object-contain"
               />

@@ -185,7 +185,7 @@ export default function PricingPage() {
           <Link href="/">
             <span className="flex items-center gap-2 cursor-pointer">
               <img
-                src="/manus-storage/sb-icon-mark-v2_6799b40d.png"
+                src="/manus-storage/sb-icon-mark_f15604c9.svg"
                 alt="SponsorBridge"
                 className="w-8 h-8 rounded-lg object-contain"
               />
@@ -408,7 +408,7 @@ export default function PricingPage() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <img
-              src="/manus-storage/sb-icon-mark-v2_6799b40d.png"
+              src="/manus-storage/sb-icon-mark_f15604c9.svg"
               alt="SponsorBridge"
               className="w-6 h-6 rounded object-contain"
             />

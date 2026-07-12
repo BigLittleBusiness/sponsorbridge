@@ -81,7 +81,7 @@ async function sendOtpEmail(to: string, firstName: string, otp: string) {
     html: `
       <div style="font-family:Inter,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#fff;">
         <div style="text-align:center;margin-bottom:24px;">
-          <img src="https://sponsorapp-k6ifqkyq.manus.space/manus-storage/sb-footer-light-v2_06d8eaed.png" alt="SponsorBridge" style="height:40px;width:auto;display:inline-block;" />
+          <img src="https://sponsorapp-k6ifqkyq.manus.space/manus-storage/sb-footer-light_b62cd37a.svg" alt="SponsorBridge" style="height:40px;width:auto;display:inline-block;" />
         </div>
         <h2 style="font-size:20px;font-weight:600;color:#1a2e1a;margin-bottom:8px;">Verify your email address</h2>
         <p style="color:#4a5568;margin-bottom:24px;">Hi ${firstName}, thanks for signing up. Enter the code below to verify your account.</p>
@@ -531,7 +531,7 @@ router.post("/forgot-password", async (req, res) => {
         html: `
           <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
             <div style="text-align:center;margin-bottom:24px;">
-              <img src="https://sponsorapp-k6ifqkyq.manus.space/manus-storage/sb-footer-light-v2_06d8eaed.png" alt="SponsorBridge" style="height:40px;width:auto;display:inline-block;" />
+              <img src="https://sponsorapp-k6ifqkyq.manus.space/manus-storage/sb-footer-light_b62cd37a.svg" alt="SponsorBridge" style="height:40px;width:auto;display:inline-block;" />
             </div>
             <h2 style="color:#1e3a5f">Reset your password</h2>
             <p>Hi ${account.firstName},</p>
