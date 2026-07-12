@@ -208,3 +208,15 @@
 - [x] Add logo img tag to OTP email template in customAuth.ts
 - [x] Add logo img tag to password reset email template in customAuth.ts
 - [x] Add favicon link tag to client/index.html
+
+## Phase 26: Registration Flow UX Fixes
+
+- [x] Fix ToS checkbox layout on Step 2 — proper flex alignment, error message placement
+- [x] Step 1: rename submit button label to "Next →" (currently "Continue →")
+- [x] Step 2: ensure "Create Account" button is clearly the primary CTA with full width
+- [x] OTP step (Step 3): add "Step 3 of 3" progress context, improve visual hierarchy
+- [x] LoginPage: remove unused Heart import, ensure Sign In button is prominent
+- [x] VerifyOtpPage: remove unused Heart import, add back-to-login escape route
+- [x] ForgotPasswordPage: align visual style with login/register (currently uses different card layout)
+- [x] ResetPasswordPage: align visual style with login/register
+- [x] All auth pages: consistent logo size (h-8) and placement

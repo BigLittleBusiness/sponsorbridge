@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Heart, ArrowRight, ArrowLeft, CheckCircle2, Loader2, ShieldCheck, Globe, Users } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle2, Loader2, ShieldCheck, Globe, Users } from "lucide-react";
 import { useCustomAuth } from "@/contexts/CustomAuthContext";
 
 // ─── Schemas ─────────────────────────────────────────────────────────────────
@@ -37,7 +37,7 @@ const step2Schema = z.object({
   orgWebsite: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
   orgSize: z.enum(["1-10", "11-50", "51-200", "200+"]),
   planTier: z.enum(["starter", "growth", "professional", "enterprise"]),
-  agreedToTerms: z.boolean().refine((v) => v === true, "You must agree to the terms"),
+  agreedToTerms: z.boolean().refine((v) => v === true, "You must agree to the terms to continue"),
 });
 
 type Step1Data = z.infer<typeof step1Schema>;
@@ -87,47 +87,67 @@ function OtpStep({ email, onSuccess }: { email: string; onSuccess: () => void })
   };
 
   return (
-    <div className="text-center space-y-6">
-      <div className="w-16 h-16 rounded-full bg-brand-red/10 flex items-center justify-center mx-auto">
-        <ShieldCheck className="w-8 h-8 text-brand-red" />
+    <div className="space-y-6">
+      {/* Step indicator */}
+      <div className="flex items-center gap-2 mb-2">
+        {[1, 2, 3].map((s) => (
+          <div key={s} className="flex items-center gap-2">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
+              s < 3 ? "bg-brand-red text-white" : "bg-brand-red text-white"
+            }`}>
+              {s < 3 ? <CheckCircle2 className="w-4 h-4" /> : "3"}
+            </div>
+            <span className={`text-sm ${s === 3 ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+              {s === 1 ? "Your details" : s === 2 ? "Organisation" : "Verify email"}
+            </span>
+            {s < 3 && <div className="w-8 h-px bg-brand-red/40 mx-1" />}
+          </div>
+        ))}
       </div>
-      <div>
-        <h2 className="text-2xl font-bold text-foreground">Check your email</h2>
-        <p className="text-muted-foreground mt-2 text-sm">
-          We sent a 6-digit verification code to<br />
-          <span className="font-semibold text-foreground">{email}</span>
+
+      <div className="text-center space-y-4 pt-2">
+        <div className="w-16 h-16 rounded-full bg-brand-red/10 flex items-center justify-center mx-auto">
+          <ShieldCheck className="w-8 h-8 text-brand-red" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Check your email</h2>
+          <p className="text-muted-foreground mt-2 text-sm">
+            We sent a 6-digit verification code to<br />
+            <span className="font-semibold text-foreground">{email}</span>
+          </p>
+        </div>
+        <div className="space-y-3">
+          <Input
+            type="text"
+            inputMode="numeric"
+            maxLength={6}
+            placeholder="000000"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+            className="text-center text-3xl tracking-[0.5em] font-bold h-16 border-2 focus:border-brand-red"
+          />
+          <Button
+            className="w-full bg-brand-red hover:bg-brand-red/90 text-white h-12 text-base font-semibold"
+            onClick={handleVerify}
+            disabled={loading || otp.length !== 6}
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+            Verify &amp; Activate Account
+            {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
+          </Button>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Didn't receive it?{" "}
+          <button
+            className="text-brand-red hover:underline font-medium disabled:opacity-50"
+            onClick={handleResend}
+            disabled={resending}
+          >
+            {resending ? "Sending..." : "Resend code"}
+          </button>
         </p>
+        <p className="text-xs text-muted-foreground">Code expires in 15 minutes</p>
       </div>
-      <div className="space-y-3">
-        <Input
-          type="text"
-          inputMode="numeric"
-          maxLength={6}
-          placeholder="000000"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-          className="text-center text-3xl tracking-[0.5em] font-bold h-16 border-2 focus:border-brand-red"
-        />
-        <Button
-          className="w-full bg-brand-red hover:bg-brand-red/90 text-white h-12 text-base"
-          onClick={handleVerify}
-          disabled={loading || otp.length !== 6}
-        >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-          Verify & Activate Account
-        </Button>
-      </div>
-      <p className="text-sm text-muted-foreground">
-        Didn't receive it?{" "}
-        <button
-          className="text-brand-red hover:underline font-medium disabled:opacity-50"
-          onClick={handleResend}
-          disabled={resending}
-        >
-          {resending ? "Sending..." : "Resend code"}
-        </button>
-      </p>
-      <p className="text-xs text-muted-foreground">Code expires in 15 minutes</p>
     </div>
   );
 }
@@ -196,7 +216,7 @@ export default function RegisterPage() {
             <img
               src="/manus-storage/sb-icon-mark_f15604c9.svg"
               alt="SponsorBridge"
-              className="w-8 h-8 rounded-lg object-contain"
+              className="w-8 h-8 object-contain"
             />
             <span className="text-white font-bold text-xl">SponsorBridge</span>
           </span>
@@ -231,13 +251,28 @@ export default function RegisterPage() {
       {/* Right panel */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-lg">
-          {/* Progress indicator */}
+
+          {/* Mobile logo */}
+          <div className="lg:hidden flex items-center gap-2 mb-8">
+            <img
+              src="/manus-storage/sb-icon-mark_f15604c9.svg"
+              alt="SponsorBridge"
+              className="w-8 h-8 object-contain"
+            />
+            <span className="font-bold text-xl">SponsorBridge</span>
+          </div>
+
+          {/* Progress indicator — Steps 1 & 2 */}
           {step < 3 && (
             <div className="flex items-center gap-2 mb-8">
               {[1, 2].map((s) => (
                 <div key={s} className="flex items-center gap-2">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
-                    step >= s ? "bg-brand-red text-white" : "bg-muted text-muted-foreground"
+                    step > s
+                      ? "bg-brand-red text-white"
+                      : step === s
+                      ? "bg-brand-red text-white"
+                      : "bg-muted text-muted-foreground"
                   }`}>
                     {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
                   </div>
@@ -247,10 +282,18 @@ export default function RegisterPage() {
                   {s < 2 && <div className="w-8 h-px bg-border mx-1" />}
                 </div>
               ))}
+              {/* Step 3 placeholder in progress bar */}
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-px bg-border mx-1" />
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold bg-muted text-muted-foreground">
+                  3
+                </div>
+                <span className="text-sm text-muted-foreground">Verify email</span>
+              </div>
             </div>
           )}
 
-          {/* Step 1: Personal details */}
+          {/* ── Step 1: Personal details ── */}
           {step === 1 && (
             <form onSubmit={form1.handleSubmit(onStep1Submit)} className="space-y-5">
               <div>
@@ -313,13 +356,24 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              <Button type="submit" className="w-full bg-brand-red hover:bg-brand-red/90 text-white h-12 text-base">
-                Continue <ArrowRight className="w-4 h-4 ml-2" />
+              <Button
+                type="submit"
+                className="w-full bg-brand-red hover:bg-brand-red/90 text-white h-12 text-base font-semibold"
+              >
+                Next — Organisation details
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
+
+              <p className="text-center text-xs text-muted-foreground">
+                By creating an account you agree to our{" "}
+                <a href="/terms" className="hover:underline text-brand-red" target="_blank" rel="noreferrer">Terms of Service</a>
+                {" "}and{" "}
+                <a href="/privacy" className="hover:underline text-brand-red" target="_blank" rel="noreferrer">Privacy Policy</a>.
+              </p>
             </form>
           )}
 
-          {/* Step 2: Organisation details */}
+          {/* ── Step 2: Organisation details ── */}
           {step === 2 && (
             <form onSubmit={form2.handleSubmit(onStep2Submit)} className="space-y-5">
               <div>
@@ -386,40 +440,50 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg border border-border">
-                <Checkbox
-                  id="terms"
-                  onCheckedChange={(checked) => form2.setValue("agreedToTerms", checked === true)}
-                />
-                <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
-                  I agree to the{" "}
-                  <a href="/terms" className="text-brand-red hover:underline" target="_blank">Terms of Service</a>
-                  {" "}and{" "}
-                  <a href="/privacy" className="text-brand-red hover:underline" target="_blank">Privacy Policy</a>
-                  , and confirm that our organisation complies with applicable child protection legislation.
-                </Label>
+              {/* Terms of Service — fixed layout */}
+              <div className="space-y-2">
+                <div className="flex items-start gap-3 p-4 bg-muted/40 rounded-lg border border-border">
+                  <Checkbox
+                    id="terms"
+                    className="mt-0.5 shrink-0"
+                    onCheckedChange={(checked) => form2.setValue("agreedToTerms", checked === true, { shouldValidate: true })}
+                  />
+                  <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer font-normal">
+                    I agree to the{" "}
+                    <a href="/terms" className="text-brand-red hover:underline font-medium" target="_blank" rel="noreferrer">Terms of Service</a>
+                    {" "}and{" "}
+                    <a href="/privacy" className="text-brand-red hover:underline font-medium" target="_blank" rel="noreferrer">Privacy Policy</a>
+                    , and confirm that our organisation complies with applicable child protection legislation.
+                  </Label>
+                </div>
+                {form2.formState.errors.agreedToTerms && (
+                  <p className="text-xs text-destructive pl-1">{form2.formState.errors.agreedToTerms.message}</p>
+                )}
               </div>
-              {form2.formState.errors.agreedToTerms && (
-                <p className="text-xs text-destructive">{form2.formState.errors.agreedToTerms.message}</p>
-              )}
 
-              <div className="flex gap-3">
-                <Button type="button" variant="outline" className="flex-1 h-12" onClick={() => setStep(1)}>
+              <div className="flex gap-3 pt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-12 px-6"
+                  onClick={() => setStep(1)}
+                >
                   <ArrowLeft className="w-4 h-4 mr-2" /> Back
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 bg-brand-red hover:bg-brand-red/90 text-white h-12 text-base"
+                  className="flex-1 bg-brand-red hover:bg-brand-red/90 text-white h-12 text-base font-semibold"
                   disabled={submitting}
                 >
                   {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                   Create Account
+                  {!submitting && <ArrowRight className="w-4 h-4 ml-2" />}
                 </Button>
               </div>
             </form>
           )}
 
-          {/* Step 3: OTP verification */}
+          {/* ── Step 3: OTP verification ── */}
           {step === 3 && (
             <OtpStep
               email={registeredEmail}
