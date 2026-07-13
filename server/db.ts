@@ -4,6 +4,7 @@ import {
   auditLogs,
   backgroundChecks,
   children,
+  childUpdates,
   consentRecords,
   InsertUser,
   messages,
@@ -661,4 +662,29 @@ export async function getSponsorImpactData(sponsorId: number, tenantId: number) 
     communityChildrenSponsored: communityChildren?.count ?? 0,
     communityTotalSponsors: communitySponsors?.count ?? 0,
   };
+}
+
+// ─── CHILD UPDATES ────────────────────────────────────────────────────────────
+
+export async function createChildUpdate(data: typeof childUpdates.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("DB not available");
+  const result = await db.insert(childUpdates).values(data);
+  return result;
+}
+
+export async function getChildUpdates(childId: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(childUpdates)
+    .where(and(eq(childUpdates.childId, childId), eq(childUpdates.tenantId, tenantId)))
+    .orderBy(desc(childUpdates.createdAt));
+}
+
+export async function deleteChildUpdate(id: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(childUpdates).where(and(eq(childUpdates.id, id), eq(childUpdates.tenantId, tenantId)));
 }

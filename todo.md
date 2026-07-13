@@ -279,3 +279,11 @@
 - [x] SponsorProfilePage.tsx — account details + notification preferences + privacy
 - [x] App.tsx — sponsor portal routes (/sponsor/*) + SponsorAuthProvider wrapper
 - [x] All TypeScript errors resolved, 27 tests passing
+
+## Phase 31: Staff-Side Post Update Form
+
+- [x] Backend: createChildUpdate, getChildUpdates, deleteChildUpdate helpers in db.ts
+- [x] Backend: children.listUpdates, children.postUpdate, children.deleteUpdate tRPC procedures
+- [x] Frontend: Post Update form inline on ChildDetail.tsx (title, category, content, media URL, publish toggle)
+- [x] Frontend: Existing updates list with type icons, date, delete action
+- [x] TypeScript clean, all 27 tests passing

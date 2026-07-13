@@ -56,6 +56,9 @@ import {
   updateTenant,
   updateUserRole,
   getSponsorImpactData,
+  createChildUpdate,
+  getChildUpdates,
+  deleteChildUpdate,
 } from "./db";
 import { TRPCError } from "@trpc/server";
 
@@ -239,6 +242,61 @@ export const appRouter = router({
         requireRole(ctx.user.role, [...MANAGER_ROLES, "field_worker"]);
         await updateChild(input.childId, input.tenantId, { photoUrl: input.photoUrl, photoKey: input.photoKey });
         await appendAuditLog({ userId: ctx.user.id, tenantId: input.tenantId, action: "CHILD_PHOTO_UPLOADED", entityType: "child", entityId: String(input.childId) });
+        return { success: true };
+      }),
+
+    // ─── CHILD UPDATES (sponsor-visible news) ──────────────────────────────
+    listUpdates: protectedProcedure
+      .input(z.object({ childId: z.number(), tenantId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, STAFF_ROLES);
+        return getChildUpdates(input.childId, input.tenantId);
+      }),
+
+    postUpdate: protectedProcedure
+      .input(z.object({
+        tenantId: z.number(),
+        childId: z.number(),
+        sponsorshipId: z.number().optional(),
+        title: z.string().min(1).max(255),
+        content: z.string().min(1),
+        updateType: z.enum(["general", "education", "health", "milestone", "photo", "letter", "video"]).default("general"),
+        mediaUrl: z.string().url().optional(),
+        isPublished: z.boolean().default(true),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, [...MANAGER_ROLES, "field_worker", "sponsor_relations"]);
+        const { tenantId, childId, ...rest } = input;
+        await createChildUpdate({
+          tenantId,
+          childId,
+          postedById: ctx.user.id,
+          publishedAt: rest.isPublished ? new Date() : undefined,
+          ...rest,
+        } as any);
+        await appendAuditLog({
+          userId: ctx.user.id,
+          tenantId,
+          action: "CHILD_UPDATE_POSTED",
+          entityType: "child",
+          entityId: String(childId),
+          afterValue: { title: rest.title, updateType: rest.updateType, isPublished: rest.isPublished },
+        });
+        return { success: true };
+      }),
+
+    deleteUpdate: protectedProcedure
+      .input(z.object({ id: z.number(), tenantId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, [...MANAGER_ROLES, "sponsor_relations"]);
+        await deleteChildUpdate(input.id, input.tenantId);
+        await appendAuditLog({
+          userId: ctx.user.id,
+          tenantId: input.tenantId,
+          action: "CHILD_UPDATE_DELETED",
+          entityType: "child",
+          entityId: String(input.id),
+        });
         return { success: true };
       }),
   }),
