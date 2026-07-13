@@ -271,7 +271,7 @@ export default function OnboardingChecklist() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#f7f7f5] flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-brand-red border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-terracotta border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -282,7 +282,7 @@ export default function OnboardingChecklist() {
       <nav className="bg-[#1a2e1a] border-b border-white/10 sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-brand-red flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-terracotta flex items-center justify-center">
               <Heart className="w-4 h-4 text-white fill-white" />
             </div>
             <span className="text-white font-bold">SponsorBridge</span>
@@ -441,7 +441,7 @@ export default function OnboardingChecklist() {
                           className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${
                             item.completed
                               ? "border-green-200 bg-green-50"
-                              : "border-border bg-white hover:border-brand-red/30"
+                              : "border-border bg-white hover:border-terracotta/30"
                           }`}
                         >
                           <button
@@ -469,7 +469,7 @@ export default function OnboardingChecklist() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="shrink-0 text-xs border-brand-red/30 text-brand-red hover:bg-brand-red/5"
+                                className="shrink-0 text-xs border-terracotta/30 text-terracotta hover:bg-terracotta/5"
                               >
                                 {item.cta}
                                 <ArrowRight className="w-3 h-3 ml-1" />
@@ -501,7 +501,7 @@ export default function OnboardingChecklist() {
             </Button>
             <Button
               onClick={handleFinish}
-              className={`${allDone ? "bg-brand-red hover:bg-brand-red/90" : "bg-muted text-muted-foreground cursor-not-allowed"} text-white`}
+              className={`${allDone ? "bg-terracotta hover:bg-terracotta/90" : "bg-muted text-muted-foreground cursor-not-allowed"} text-white`}
               disabled={!allDone}
             >
               Go to dashboard

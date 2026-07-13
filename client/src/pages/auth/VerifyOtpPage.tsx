@@ -72,8 +72,8 @@ export default function VerifyOtpPage() {
         </div>
 
         <div className="text-center space-y-6">
-          <div className="w-16 h-16 rounded-full bg-brand-red/10 flex items-center justify-center mx-auto">
-            <ShieldCheck className="w-8 h-8 text-brand-red" />
+          <div className="w-16 h-16 rounded-full bg-terracotta/10 flex items-center justify-center mx-auto">
+            <ShieldCheck className="w-8 h-8 text-terracotta" />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-foreground">Verify your email</h2>
@@ -94,10 +94,10 @@ export default function VerifyOtpPage() {
               placeholder="000000"
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-              className="text-center text-3xl tracking-[0.5em] font-bold h-16 border-2 focus:border-brand-red"
+              className="text-center text-3xl tracking-[0.5em] font-bold h-16 border-2 focus:border-terracotta"
             />
             <Button
-              className="w-full bg-brand-red hover:bg-brand-red/90 text-white h-12 text-base font-semibold"
+              className="w-full bg-terracotta hover:bg-terracotta/90 text-white h-12 text-base font-semibold"
               onClick={handleVerify}
               disabled={loading || otp.length !== 6}
             >
@@ -109,7 +109,7 @@ export default function VerifyOtpPage() {
           <p className="text-sm text-muted-foreground">
             Didn't receive it?{" "}
             <button
-              className="text-brand-red hover:underline font-medium"
+              className="text-terracotta hover:underline font-medium"
               onClick={handleResend}
               disabled={resending}
             >

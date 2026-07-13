@@ -137,7 +137,7 @@ export default function ResetPasswordPage() {
           {/* Loading token validation */}
           {tokenValid === null && (
             <div className="text-center space-y-4">
-              <Loader2 className="w-8 h-8 animate-spin text-brand-red mx-auto" />
+              <Loader2 className="w-8 h-8 animate-spin text-terracotta mx-auto" />
               <p className="text-muted-foreground">Validating your reset link...</p>
             </div>
           )}
@@ -155,7 +155,7 @@ export default function ResetPasswordPage() {
                 </p>
               </div>
               <Link href="/forgot-password">
-                <Button className="w-full h-12 bg-brand-red hover:bg-brand-red/90 text-white font-semibold">
+                <Button className="w-full h-12 bg-terracotta hover:bg-terracotta/90 text-white font-semibold">
                   Request a new reset link
                 </Button>
               </Link>
@@ -179,7 +179,7 @@ export default function ResetPasswordPage() {
                 </p>
               </div>
               <Link href="/login">
-                <Button className="w-full h-12 bg-brand-red hover:bg-brand-red/90 text-white font-semibold">
+                <Button className="w-full h-12 bg-terracotta hover:bg-terracotta/90 text-white font-semibold">
                   Sign in now
                 </Button>
               </Link>
@@ -190,8 +190,8 @@ export default function ResetPasswordPage() {
           {tokenValid === true && !success && (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <div className="w-14 h-14 rounded-full bg-brand-red/10 flex items-center justify-center mb-4">
-                  <ShieldCheck className="w-7 h-7 text-brand-red" />
+                <div className="w-14 h-14 rounded-full bg-terracotta/10 flex items-center justify-center mb-4">
+                  <ShieldCheck className="w-7 h-7 text-terracotta" />
                 </div>
                 <h1 className="text-2xl font-bold text-foreground">Choose a new password</h1>
                 <p className="text-muted-foreground text-sm mt-1">
@@ -256,7 +256,7 @@ export default function ResetPasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-brand-red hover:bg-brand-red/90 text-white font-semibold text-base"
+                className="w-full h-12 bg-terracotta hover:bg-terracotta/90 text-white font-semibold text-base"
                 disabled={loading || !password || !confirm || password !== confirm}
               >
                 {loading ? (

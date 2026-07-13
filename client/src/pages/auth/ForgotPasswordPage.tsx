@@ -76,8 +76,8 @@ export default function ForgotPasswordPage() {
           {!submitted ? (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <div className="w-14 h-14 rounded-full bg-brand-red/10 flex items-center justify-center mb-4">
-                  <Mail className="w-7 h-7 text-brand-red" />
+                <div className="w-14 h-14 rounded-full bg-terracotta/10 flex items-center justify-center mb-4">
+                  <Mail className="w-7 h-7 text-terracotta" />
                 </div>
                 <h1 className="text-2xl font-bold text-foreground">Forgot your password?</h1>
                 <p className="text-muted-foreground text-sm mt-1">
@@ -107,7 +107,7 @@ export default function ForgotPasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-brand-red hover:bg-brand-red/90 text-white font-semibold text-base"
+                className="w-full h-12 bg-terracotta hover:bg-terracotta/90 text-white font-semibold text-base"
                 disabled={loading || !email}
               >
                 {loading ? (
@@ -156,7 +156,7 @@ export default function ForgotPasswordPage() {
 
           <p className="text-center text-xs text-muted-foreground mt-8">
             Need help?{" "}
-            <a href="mailto:support@sponsorbridge.com" className="text-brand-red hover:underline">
+            <a href="mailto:support@sponsorbridge.com" className="text-terracotta hover:underline">
               Contact support
             </a>
           </p>

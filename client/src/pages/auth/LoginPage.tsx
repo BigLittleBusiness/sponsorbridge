@@ -68,7 +68,7 @@ export default function LoginPage() {
             Your account for <strong>{needsVerification}</strong> has not been verified yet. Please check your email for the verification code.
           </p>
           <Button
-            className="w-full bg-brand-red hover:bg-brand-red/90 text-white"
+            className="w-full bg-terracotta hover:bg-terracotta/90 text-white"
             onClick={() => navigate(`/verify-otp?email=${encodeURIComponent(needsVerification)}`)}
           >
             Enter Verification Code
@@ -126,7 +126,7 @@ export default function LoginPage() {
               <h1 className="text-2xl font-bold text-foreground">Sign in to your account</h1>
               <p className="text-muted-foreground text-sm mt-1">
                 Don't have an account?{" "}
-                <Link href="/register" className="text-brand-red hover:underline font-medium">Create one free</Link>
+                <Link href="/register" className="text-terracotta hover:underline font-medium">Create one free</Link>
               </p>
             </div>
 
@@ -145,7 +145,7 @@ export default function LoginPage() {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="/forgot-password" className="text-xs text-brand-red hover:underline">
+                <Link href="/forgot-password" className="text-xs text-terracotta hover:underline">
                   Forgot password?
                 </Link>
               </div>
@@ -161,7 +161,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-brand-red hover:bg-brand-red/90 text-white h-12 text-base"
+              className="w-full bg-terracotta hover:bg-terracotta/90 text-white h-12 text-base"
               disabled={loading}
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}

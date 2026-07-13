@@ -93,21 +93,21 @@ function OtpStep({ email, onSuccess }: { email: string; onSuccess: () => void })
         {[1, 2, 3].map((s) => (
           <div key={s} className="flex items-center gap-2">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
-              s < 3 ? "bg-brand-red text-white" : "bg-brand-red text-white"
+              s < 3 ? "bg-terracotta text-white" : "bg-terracotta text-white"
             }`}>
               {s < 3 ? <CheckCircle2 className="w-4 h-4" /> : "3"}
             </div>
             <span className={`text-sm ${s === 3 ? "text-foreground font-medium" : "text-muted-foreground"}`}>
               {s === 1 ? "Your details" : s === 2 ? "Organisation" : "Verify email"}
             </span>
-            {s < 3 && <div className="w-8 h-px bg-brand-red/40 mx-1" />}
+            {s < 3 && <div className="w-8 h-px bg-terracotta/40 mx-1" />}
           </div>
         ))}
       </div>
 
       <div className="text-center space-y-4 pt-2">
-        <div className="w-16 h-16 rounded-full bg-brand-red/10 flex items-center justify-center mx-auto">
-          <ShieldCheck className="w-8 h-8 text-brand-red" />
+        <div className="w-16 h-16 rounded-full bg-terracotta/10 flex items-center justify-center mx-auto">
+          <ShieldCheck className="w-8 h-8 text-terracotta" />
         </div>
         <div>
           <h2 className="text-2xl font-bold text-foreground">Check your email</h2>
@@ -124,10 +124,10 @@ function OtpStep({ email, onSuccess }: { email: string; onSuccess: () => void })
             placeholder="000000"
             value={otp}
             onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-            className="text-center text-3xl tracking-[0.5em] font-bold h-16 border-2 focus:border-brand-red"
+            className="text-center text-3xl tracking-[0.5em] font-bold h-16 border-2 focus:border-terracotta"
           />
           <Button
-            className="w-full bg-brand-red hover:bg-brand-red/90 text-white h-12 text-base font-semibold"
+            className="w-full bg-terracotta hover:bg-terracotta/90 text-white h-12 text-base font-semibold"
             onClick={handleVerify}
             disabled={loading || otp.length !== 6}
           >
@@ -139,7 +139,7 @@ function OtpStep({ email, onSuccess }: { email: string; onSuccess: () => void })
         <p className="text-sm text-muted-foreground">
           Didn't receive it?{" "}
           <button
-            className="text-brand-red hover:underline font-medium disabled:opacity-50"
+            className="text-terracotta hover:underline font-medium disabled:opacity-50"
             onClick={handleResend}
             disabled={resending}
           >
@@ -237,8 +237,8 @@ export default function RegisterPage() {
               { icon: Users, text: "7 role-based access levels for your team" },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-brand-red/20 flex items-center justify-center shrink-0">
-                  <Icon className="w-4 h-4 text-brand-red" />
+                <div className="w-8 h-8 rounded-full bg-terracotta/20 flex items-center justify-center shrink-0">
+                  <Icon className="w-4 h-4 text-terracotta" />
                 </div>
                 <span className="text-white/80 text-sm">{text}</span>
               </div>
@@ -269,9 +269,9 @@ export default function RegisterPage() {
                 <div key={s} className="flex items-center gap-2">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
                     step > s
-                      ? "bg-brand-red text-white"
+                      ? "bg-terracotta text-white"
                       : step === s
-                      ? "bg-brand-red text-white"
+                      ? "bg-terracotta text-white"
                       : "bg-muted text-muted-foreground"
                   }`}>
                     {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
@@ -300,7 +300,7 @@ export default function RegisterPage() {
                 <h1 className="text-2xl font-bold text-foreground">Create your account</h1>
                 <p className="text-muted-foreground text-sm mt-1">
                   Already have an account?{" "}
-                  <Link href="/login" className="text-brand-red hover:underline font-medium">Sign in</Link>
+                  <Link href="/login" className="text-terracotta hover:underline font-medium">Sign in</Link>
                 </p>
               </div>
 
@@ -358,7 +358,7 @@ export default function RegisterPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-brand-red hover:bg-brand-red/90 text-white h-12 text-base font-semibold"
+                className="w-full bg-terracotta hover:bg-terracotta/90 text-white h-12 text-base font-semibold"
               >
                 Next — Organisation details
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -366,9 +366,9 @@ export default function RegisterPage() {
 
               <p className="text-center text-xs text-muted-foreground">
                 By creating an account you agree to our{" "}
-                <a href="/terms" className="hover:underline text-brand-red" target="_blank" rel="noreferrer">Terms of Service</a>
+                <a href="/terms" className="hover:underline text-terracotta" target="_blank" rel="noreferrer">Terms of Service</a>
                 {" "}and{" "}
-                <a href="/privacy" className="hover:underline text-brand-red" target="_blank" rel="noreferrer">Privacy Policy</a>.
+                <a href="/privacy" className="hover:underline text-terracotta" target="_blank" rel="noreferrer">Privacy Policy</a>.
               </p>
             </form>
           )}
@@ -450,9 +450,9 @@ export default function RegisterPage() {
                   />
                   <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer font-normal">
                     I agree to the{" "}
-                    <a href="/terms" className="text-brand-red hover:underline font-medium" target="_blank" rel="noreferrer">Terms of Service</a>
+                    <a href="/terms" className="text-terracotta hover:underline font-medium" target="_blank" rel="noreferrer">Terms of Service</a>
                     {" "}and{" "}
-                    <a href="/privacy" className="text-brand-red hover:underline font-medium" target="_blank" rel="noreferrer">Privacy Policy</a>
+                    <a href="/privacy" className="text-terracotta hover:underline font-medium" target="_blank" rel="noreferrer">Privacy Policy</a>
                     , and confirm that our organisation complies with applicable child protection legislation.
                   </Label>
                 </div>
@@ -472,7 +472,7 @@ export default function RegisterPage() {
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 bg-brand-red hover:bg-brand-red/90 text-white h-12 text-base font-semibold"
+                  className="flex-1 bg-terracotta hover:bg-terracotta/90 text-white h-12 text-base font-semibold"
                   disabled={submitting}
                 >
                   {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}

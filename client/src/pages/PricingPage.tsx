@@ -46,7 +46,7 @@ const TIERS = [
     price: "$99",
     priceNote: "per month, billed monthly",
     description: "For growing organisations ready to scale their sponsorship programme.",
-    color: "border-brand-red",
+    color: "border-terracotta",
     badge: "Most popular",
     cta: "Start free trial",
     ctaVariant: "default" as const,
@@ -195,7 +195,7 @@ export default function PricingPage() {
           <div className="flex items-center gap-3">
             {account ? (
               <Link href="/org-dashboard">
-                <Button size="sm" className="bg-brand-red hover:bg-brand-red/90 text-white">
+                <Button size="sm" className="bg-terracotta hover:bg-terracotta/90 text-white">
                   Go to Dashboard
                 </Button>
               </Link>
@@ -207,7 +207,7 @@ export default function PricingPage() {
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm" className="bg-brand-red hover:bg-brand-red/90 text-white">
+                  <Button size="sm" className="bg-terracotta hover:bg-terracotta/90 text-white">
                     Create Account
                   </Button>
                 </Link>
@@ -220,7 +220,7 @@ export default function PricingPage() {
       {/* Hero */}
       <section className="pt-20 pb-12 text-center px-6">
         <div className="max-w-3xl mx-auto">
-          <Badge variant="outline" className="mb-4 text-brand-red border-brand-red/30 bg-brand-red/5">
+          <Badge variant="outline" className="mb-4 text-terracotta border-terracotta/30 bg-terracotta/5">
             Transparent pricing
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold text-[#1a2e1a] leading-tight mb-4">
@@ -233,13 +233,13 @@ export default function PricingPage() {
           {/* Annual toggle */}
           <div className="inline-flex items-center gap-3 bg-white border border-border rounded-full px-4 py-2">
             <button
-              className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${!annual ? "bg-brand-red text-white" : "text-muted-foreground"}`}
+              className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${!annual ? "bg-terracotta text-white" : "text-muted-foreground"}`}
               onClick={() => setAnnual(false)}
             >
               Monthly
             </button>
             <button
-              className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${annual ? "bg-brand-red text-white" : "text-muted-foreground"}`}
+              className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${annual ? "bg-terracotta text-white" : "text-muted-foreground"}`}
               onClick={() => setAnnual(true)}
             >
               Annual
@@ -261,7 +261,7 @@ export default function PricingPage() {
             >
               {tier.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-brand-red text-white border-0 px-3 py-1 text-xs font-semibold shadow">
+                  <Badge className="bg-terracotta text-white border-0 px-3 py-1 text-xs font-semibold shadow">
                     {tier.badge}
                   </Badge>
                 </div>
@@ -284,7 +284,7 @@ export default function PricingPage() {
               <a href={getCtaHref(tier)} target={tier.key === "enterprise" ? "_blank" : undefined}>
                 <Button
                   variant={tier.ctaVariant}
-                  className={`w-full mb-5 ${tier.ctaVariant === "default" ? "bg-brand-red hover:bg-brand-red/90 text-white" : ""}`}
+                  className={`w-full mb-5 ${tier.ctaVariant === "default" ? "bg-terracotta hover:bg-terracotta/90 text-white" : ""}`}
                 >
                   {tier.cta} {tier.key !== "enterprise" && <ArrowRight className="w-4 h-4 ml-1" />}
                 </Button>
@@ -324,13 +324,13 @@ export default function PricingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {ADD_ONS.map((addon) => (
               <div key={addon.name} className="bg-white rounded-xl border border-border p-5 flex gap-4">
-                <div className="w-10 h-10 rounded-lg bg-brand-red/10 flex items-center justify-center shrink-0">
-                  <addon.icon className="w-5 h-5 text-brand-red" />
+                <div className="w-10 h-10 rounded-lg bg-terracotta/10 flex items-center justify-center shrink-0">
+                  <addon.icon className="w-5 h-5 text-terracotta" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <h3 className="font-semibold text-[#1a2e1a] text-sm">{addon.name}</h3>
-                    <span className="text-sm font-bold text-brand-red whitespace-nowrap">{addon.price}</span>
+                    <span className="text-sm font-bold text-terracotta whitespace-nowrap">{addon.price}</span>
                   </div>
                   <p className="text-xs text-muted-foreground mb-1">{addon.description}</p>
                   <Badge variant="outline" className="text-xs">{addon.applicableTo}</Badge>
@@ -390,7 +390,7 @@ export default function PricingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/register">
-              <Button className="bg-brand-red hover:bg-brand-red/90 text-white px-8 h-12 text-base">
+              <Button className="bg-terracotta hover:bg-terracotta/90 text-white px-8 h-12 text-base">
                 Create free account <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
