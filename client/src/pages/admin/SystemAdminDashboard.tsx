@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useCustomAuth } from "@/contexts/CustomAuthContext";
 import { useLocation } from "wouter";
@@ -15,8 +15,14 @@ import {
   Settings, Mail, CreditCard, Building2, BarChart3, Activity,
   ToggleLeft, ScrollText, Megaphone, Shield, Users, CheckCircle2,
   XCircle, AlertTriangle, RefreshCw, Eye, EyeOff, Send, Loader2,
-  TrendingUp, Database, Server, Clock
+  TrendingUp, Database, Server, Clock, Baby, DollarSign, UserCheck,
+  UserX, Search, ChevronLeft, ChevronRight, Globe, Heart, Zap
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell, Legend
+} from "recharts";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function StatusDot({ ok }: { ok: boolean }) {
@@ -672,10 +678,507 @@ function BroadcastTab() {
   );
 }
 
+// ── Tab: Platform Overview ───────────────────────────────────────────────────
+function OverviewTab() {
+  const { data, isLoading } = trpc.sysAdmin.getPlatformOverview.useQuery();
+
+  if (isLoading) return <div className="flex justify-center py-16"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
+
+  const STATUS_COLORS: Record<string, string> = {
+    SPONSORED: "#1a3a2e", AVAILABLE: "#c1440e", WAITLISTED: "#f4a261", GRADUATED: "#94a3b8",
+  };
+
+  const childPie = (data?.childrenByStatus ?? []).map(r => ({
+    name: r.status.charAt(0) + r.status.slice(1).toLowerCase(),
+    value: r.count,
+    color: STATUS_COLORS[r.status] ?? "#94a3b8",
+  }));
+
+  const kpis = [
+    { label: "Client Organisations", value: data?.totalOrgs ?? 0, sub: `+${data?.newOrgs30d ?? 0} this month`, icon: Building2, color: "bg-blue-50 text-blue-700" },
+    { label: "Total Sponsors", value: data?.totalSponsors ?? 0, sub: `+${data?.newSponsors30d ?? 0} this month`, icon: Users, color: "bg-green-50 text-green-700" },
+    { label: "Total Children", value: data?.totalChildren ?? 0, sub: `${data?.childrenByStatus?.find(s => s.status === 'SPONSORED')?.count ?? 0} sponsored`, icon: Baby, color: "bg-orange-50 text-orange-700" },
+    { label: "Active Sponsorships", value: data?.activeSponsorships ?? 0, sub: `${data?.activeSponsors ?? 0} active sponsors`, icon: Heart, color: "bg-pink-50 text-pink-700" },
+    { label: "All-Time Revenue", value: `$${((data?.allTimeRevenueCents ?? 0) / 100).toLocaleString()}`, sub: `$${((data?.last30DaysRevenueCents ?? 0) / 100).toLocaleString()} last 30d`, icon: DollarSign, color: "bg-emerald-50 text-emerald-700" },
+    { label: "Active Users (7d)", value: data?.activeUsers7d ?? 0, sub: `${data?.verifiedOrgs ?? 0} verified orgs`, icon: Zap, color: "bg-purple-50 text-purple-700" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-base font-semibold mb-1">Platform Overview</h3>
+        <p className="text-sm text-muted-foreground">A holistic view of all activity across the SponsorBridge platform.</p>
+      </div>
+
+      {/* KPI Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {kpis.map(k => (
+          <Card key={k.label}>
+            <CardContent className="pt-5 pb-4">
+              <div className={`w-9 h-9 rounded-lg ${k.color.split(" ")[0]} flex items-center justify-center mb-3`}>
+                <k.icon className={`w-4.5 h-4.5 ${k.color.split(" ")[1]}`} />
+              </div>
+              <div className="text-2xl font-bold text-foreground">{k.value}</div>
+              <div className="text-xs font-medium text-muted-foreground mt-0.5">{k.label}</div>
+              <div className="text-xs text-muted-foreground mt-1">{k.sub}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Charts row */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm">New Client Signups (30d)</CardTitle></CardHeader>
+          <CardContent>
+            {(data?.signupTrend?.length ?? 0) > 0 ? (
+              <ResponsiveContainer width="100%" height={160}>
+                <AreaChart data={data!.signupTrend}>
+                  <defs><linearGradient id="orgGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#1a3a2e" stopOpacity={0.2}/><stop offset="95%" stopColor="#1a3a2e" stopOpacity={0}/></linearGradient></defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="day" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip labelFormatter={d => `Date: ${d}`} />
+                  <Area type="monotone" dataKey="count" stroke="#1a3a2e" fill="url(#orgGrad)" strokeWidth={2} name="Signups" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : <div className="h-40 flex items-center justify-center text-sm text-muted-foreground">No signup data yet</div>}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm">Children by Status</CardTitle></CardHeader>
+          <CardContent>
+            {childPie.length > 0 ? (
+              <ResponsiveContainer width="100%" height={160}>
+                <PieChart>
+                  <Pie data={childPie} cx="50%" cy="50%" innerRadius={40} outerRadius={65} paddingAngle={3} dataKey="value">
+                    {childPie.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                  </Pie>
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px" }} />
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : <div className="h-40 flex items-center justify-center text-sm text-muted-foreground">No children data yet</div>}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Sponsor trend */}
+      <Card>
+        <CardHeader className="pb-3"><CardTitle className="text-sm">New Sponsors Registered (30d)</CardTitle></CardHeader>
+        <CardContent>
+          {(data?.sponsorTrend?.length ?? 0) > 0 ? (
+            <ResponsiveContainer width="100%" height={140}>
+              <BarChart data={data!.sponsorTrend} barSize={14}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="day" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip labelFormatter={d => `Date: ${d}`} />
+                <Bar dataKey="count" fill="#c1440e" radius={[3, 3, 0, 0]} name="New Sponsors" />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : <div className="h-36 flex items-center justify-center text-sm text-muted-foreground">No sponsor data yet</div>}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ── Tab: Client Accounts ──────────────────────────────────────────────────────
+function ClientAccountsTab() {
+  const [search, setSearch] = useState("");
+  const [planFilter, setPlanFilter] = useState<string>("all");
+  const [verifiedFilter, setVerifiedFilter] = useState<string>("all");
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 20;
+  const utils = trpc.useUtils();
+
+  const { data, isLoading } = trpc.sysAdmin.searchAccounts.useQuery({
+    search: search || undefined,
+    planTier: planFilter !== "all" ? (planFilter as any) : undefined,
+    isVerified: verifiedFilter === "all" ? undefined : verifiedFilter === "verified",
+    limit: PAGE_SIZE,
+    offset: page * PAGE_SIZE,
+  });
+
+  const updateAccount = trpc.sysAdmin.updateAccount.useMutation({
+    onSuccess: () => { toast.success("Account updated"); utils.sysAdmin.searchAccounts.invalidate(); },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const PLAN_COLORS: Record<string, string> = {
+    starter: "bg-gray-100 text-gray-700",
+    growth: "bg-blue-100 text-blue-700",
+    professional: "bg-purple-100 text-purple-700",
+    enterprise: "bg-amber-100 text-amber-700",
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-base font-semibold mb-1">Client Organisations</h3>
+        <p className="text-sm text-muted-foreground">All registered charity/NGO accounts across the platform.</p>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-48">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            className="w-full pl-9 pr-3 py-2 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            placeholder="Search by org, email, or name…"
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(0); }}
+          />
+        </div>
+        <Select value={planFilter} onValueChange={v => { setPlanFilter(v); setPage(0); }}>
+          <SelectTrigger className="w-36 h-9 text-sm"><SelectValue placeholder="Plan" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Plans</SelectItem>
+            <SelectItem value="starter">Starter</SelectItem>
+            <SelectItem value="growth">Growth</SelectItem>
+            <SelectItem value="professional">Professional</SelectItem>
+            <SelectItem value="enterprise">Enterprise</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={verifiedFilter} onValueChange={v => { setVerifiedFilter(v); setPage(0); }}>
+          <SelectTrigger className="w-36 h-9 text-sm"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="verified">Verified</SelectItem>
+            <SelectItem value="unverified">Unverified</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Card>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/40">
+                    {["Organisation", "Contact", "Plan", "Children", "Sponsors", "Active", "Joined", "Actions"].map(h => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(data?.rows ?? []).map(acc => (
+                    <tr key={acc.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-foreground">{acc.orgName}</div>
+                        <div className="text-xs text-muted-foreground">{acc.orgCountry}</div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div>{acc.firstName} {acc.lastName}</div>
+                        <div className="text-xs text-muted-foreground">{acc.email}</div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge className={`text-xs ${PLAN_COLORS[acc.planTier ?? "starter"] ?? ""}`} variant="outline">
+                          {acc.planTier}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-center font-medium">{acc.childCount}</td>
+                      <td className="px-4 py-3 text-center font-medium">{acc.sponsorCount}</td>
+                      <td className="px-4 py-3">
+                        {acc.isVerified
+                          ? <span className="flex items-center gap-1 text-green-600 text-xs"><UserCheck className="w-3.5 h-3.5" />Verified</span>
+                          : <span className="flex items-center gap-1 text-amber-600 text-xs"><UserX className="w-3.5 h-3.5" />Pending</span>}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                        {acc.createdAt ? new Date(acc.createdAt).toLocaleDateString() : "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-1">
+                          {!acc.isVerified && (
+                            <Button size="sm" variant="outline" className="h-7 text-xs"
+                              disabled={updateAccount.isPending}
+                              onClick={() => updateAccount.mutate({ accountId: acc.id, isVerified: true })}>
+                              Verify
+                            </Button>
+                          )}
+                          <Select
+                            value={acc.planTier ?? "starter"}
+                            onValueChange={v => updateAccount.mutate({ accountId: acc.id, planTier: v as any })}>
+                            <SelectTrigger className="h-7 w-28 text-xs"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="starter">Starter</SelectItem>
+                              <SelectItem value="growth">Growth</SelectItem>
+                              <SelectItem value="professional">Professional</SelectItem>
+                              <SelectItem value="enterprise">Enterprise</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {(data?.rows?.length ?? 0) === 0 && (
+                    <tr><td colSpan={8} className="px-4 py-10 text-center text-muted-foreground text-sm">No accounts found</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Pagination */}
+      {(data?.total ?? 0) > PAGE_SIZE && (
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Showing {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, data?.total ?? 0)} of {data?.total} accounts</span>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button variant="outline" size="sm" disabled={(page + 1) * PAGE_SIZE >= (data?.total ?? 0)} onClick={() => setPage(p => p + 1)}>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Tab: Sponsor Users ────────────────────────────────────────────────────────
+function SponsorUsersTab() {
+  const [search, setSearch] = useState("");
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 20;
+  const utils = trpc.useUtils();
+
+  const { data, isLoading } = trpc.sysAdmin.listSponsors.useQuery({
+    search: search || undefined,
+    isActive: activeFilter === "all" ? undefined : activeFilter === "active",
+    limit: PAGE_SIZE,
+    offset: page * PAGE_SIZE,
+  });
+
+  const updateStatus = trpc.sysAdmin.updateSponsorStatus.useMutation({
+    onSuccess: () => { toast.success("Sponsor status updated"); utils.sysAdmin.listSponsors.invalidate(); },
+    onError: (e) => toast.error(e.message),
+  });
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-base font-semibold mb-1">Sponsor Users</h3>
+        <p className="text-sm text-muted-foreground">All sponsor accounts across every client organisation.</p>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-48">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            className="w-full pl-9 pr-3 py-2 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            placeholder="Search by name, email, or country…"
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(0); }}
+          />
+        </div>
+        <Select value={activeFilter} onValueChange={v => { setActiveFilter(v); setPage(0); }}>
+          <SelectTrigger className="w-36 h-9 text-sm"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Card>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/40">
+                    {["Sponsor", "Organisation", "Country", "Sponsorships", "Status", "Joined", "Actions"].map(h => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(data?.rows ?? []).map(s => (
+                    <tr key={s.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="font-medium">{s.firstName} {s.lastName}</div>
+                        <div className="text-xs text-muted-foreground">{s.email}</div>
+                      </td>
+                      <td className="px-4 py-3 text-sm">{s.tenantName}</td>
+                      <td className="px-4 py-3">
+                        {s.country && <span className="flex items-center gap-1 text-xs"><Globe className="w-3 h-3" />{s.country}</span>}
+                      </td>
+                      <td className="px-4 py-3 text-center font-medium">{s.activeSponsorships}</td>
+                      <td className="px-4 py-3">
+                        {s.isActive
+                          ? <Badge className="bg-green-100 text-green-700 text-xs" variant="outline">Active</Badge>
+                          : <Badge className="bg-red-100 text-red-700 text-xs" variant="outline">Inactive</Badge>}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                        {s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Button
+                          size="sm" variant="outline"
+                          className={`h-7 text-xs ${s.isActive ? "text-red-600 hover:text-red-700" : "text-green-600 hover:text-green-700"}`}
+                          disabled={updateStatus.isPending}
+                          onClick={() => updateStatus.mutate({ sponsorId: s.id, isActive: !s.isActive })}>
+                          {s.isActive ? "Deactivate" : "Activate"}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                  {(data?.rows?.length ?? 0) === 0 && (
+                    <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground text-sm">No sponsors found</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Pagination */}
+      {(data?.total ?? 0) > PAGE_SIZE && (
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Showing {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, data?.total ?? 0)} of {data?.total} sponsors</span>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button variant="outline" size="sm" disabled={(page + 1) * PAGE_SIZE >= (data?.total ?? 0)} onClick={() => setPage(p => p + 1)}>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Tab: Platform Statistics ────────────────────────────────────────────────
+function PlatformStatsTab() {
+  const { data, isLoading } = trpc.sysAdmin.getPlatformOverview.useQuery();
+  const { data: billing, isLoading: billingLoading } = trpc.sysAdmin.getBillingOverview.useQuery();
+
+  if (isLoading || billingLoading) return <div className="flex justify-center py-16"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
+
+  const PLAN_COLORS: Record<string, string> = {
+    starter: "#94a3b8", growth: "#60a5fa", professional: "#1a3a2e", enterprise: "#c1440e",
+  };
+
+  const planData = (billing?.tierBreakdown ?? []).map((r: { tier: string | null; count: number }) => ({
+    name: (r.tier ?? "unknown").charAt(0).toUpperCase() + (r.tier ?? "unknown").slice(1),
+    value: r.count,
+    color: PLAN_COLORS[r.tier ?? "starter"] ?? "#94a3b8",
+  }));
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-base font-semibold mb-1">Platform Statistics</h3>
+        <p className="text-sm text-muted-foreground">Detailed charts and breakdowns of platform growth and usage.</p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Signup trend */}
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm">Client Signups — Last 30 Days</CardTitle></CardHeader>
+          <CardContent>
+            {(data?.signupTrend?.length ?? 0) > 0 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <AreaChart data={data!.signupTrend}>
+                  <defs><linearGradient id="sgGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#1a3a2e" stopOpacity={0.25}/><stop offset="95%" stopColor="#1a3a2e" stopOpacity={0}/></linearGradient></defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="day" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="count" stroke="#1a3a2e" fill="url(#sgGrad)" strokeWidth={2} name="Signups" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : <div className="h-44 flex items-center justify-center text-sm text-muted-foreground">No data yet</div>}
+          </CardContent>
+        </Card>
+
+        {/* Plan distribution */}
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm">Plan Distribution</CardTitle></CardHeader>
+          <CardContent>
+            {planData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <PieChart>
+                  <Pie data={planData} cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={3} dataKey="value">
+                    {planData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                  </Pie>
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px" }} />
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : <div className="h-44 flex items-center justify-center text-sm text-muted-foreground">No data yet</div>}
+          </CardContent>
+        </Card>
+
+        {/* Sponsor registrations */}
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm">Sponsor Registrations — Last 30 Days</CardTitle></CardHeader>
+          <CardContent>
+            {(data?.sponsorTrend?.length ?? 0) > 0 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={data!.sponsorTrend} barSize={12}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="day" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#c1440e" radius={[3, 3, 0, 0]} name="Sponsors" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : <div className="h-44 flex items-center justify-center text-sm text-muted-foreground">No data yet</div>}
+          </CardContent>
+        </Card>
+
+        {/* Children by status */}
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm">Children by Status</CardTitle></CardHeader>
+          <CardContent>
+            {(data?.childrenByStatus?.length ?? 0) > 0 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={data!.childrenByStatus.map(r => ({ name: r.status.charAt(0) + r.status.slice(1).toLowerCase(), count: r.count }))} barSize={28}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="name" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#1a3a2e" radius={[3, 3, 0, 0]} name="Children" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : <div className="h-44 flex items-center justify-center text-sm text-muted-foreground">No data yet</div>}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function SystemAdminDashboard() {
   const { account, loading: isLoading } = useCustomAuth();
   const [, navigate] = useLocation();
+
+  useEffect(() => {
+    if (!isLoading && !account) {
+      navigate("/login");
+    } else if (!isLoading && account && !account.isSystemAdmin) {
+      navigate("/org-dashboard");
+    }
+  }, [isLoading, account]);
 
   if (isLoading) {
     return (
@@ -685,12 +1188,13 @@ export default function SystemAdminDashboard() {
     );
   }
 
-  if (!account) {
-    navigate("/login");
-    return null;
-  }
+  if (!account || !account.isSystemAdmin) return null;
 
   const tabs = [
+    { value: "overview", label: "Overview", icon: BarChart3, component: <OverviewTab /> },
+    { value: "clients", label: "Client Accounts", icon: Building2, component: <ClientAccountsTab /> },
+    { value: "sponsors", label: "Sponsor Users", icon: Users, component: <SponsorUsersTab /> },
+    { value: "platform-stats", label: "Platform Statistics", icon: TrendingUp, component: <PlatformStatsTab /> },
     { value: "email", label: "Email / SES", icon: Mail, component: <EmailTab /> },
     { value: "stripe", label: "Stripe", icon: CreditCard, component: <StripeTab /> },
     { value: "tenants", label: "Tenants", icon: Building2, component: <TenantsTab /> },

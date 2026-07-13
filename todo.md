@@ -220,3 +220,37 @@
 - [x] ForgotPasswordPage: align visual style with login/register (currently uses different card layout)
 - [x] ResetPasswordPage: align visual style with login/register
 - [x] All auth pages: consistent logo size (h-8) and placement
+
+## Phase 27: System Admin Dashboard
+
+- [x] Fix Dockerfile — copy patches/ directory so pnpm install succeeds in Docker build
+- [x] Add `is_system_admin` flag to custom_accounts or use a separate admin check in auth
+- [x] Add tRPC admin router with procedures: platform stats, user list, user detail, suspend/activate user
+- [x] Build AdminLayout component (sidebar with: Overview, Client Accounts, Sponsor Users, Platform Stats, System)
+- [x] Build Admin Overview page — KPI cards (total orgs, active sponsors, children enrolled, MRR, new signups 30d)
+- [x] Build Client Accounts page — searchable/filterable table of all custom_accounts with plan, status, last login, actions
+- [x] Build Sponsor Users page — searchable table of all sponsor users across all tenants
+- [x] Build Platform Statistics page — charts: signups over time, plan distribution, sponsor activity, geographic spread
+- [x] Add admin route guard — redirect non-admins away from /admin/* routes
+- [x] Wire admin account (tizzbizz+sb-sysadmin@gmail.com) to admin role in DB
+
+## Phase 28: Complete Client Dashboard (reference design)
+
+- [x] Build OrgDashboardLayout — dark forest green sidebar (#1a3a2e), terracotta active state (#c1440e), SponsorBridge logo at top
+- [x] Sidebar nav: Dashboard, Children, Sponsors, Communications, Reports, Donations, Events, Settings
+- [x] Dashboard home page — greeting header, 3 KPI cards (Sponsors, Children, Retention %), child spotlight card, recent activity feed, sponsorship overview charts
+- [x] Children page — searchable/filterable table with status badges, add child button
+- [x] Sponsors page — searchable table with active sponsorship count, contact info
+- [x] Communications page — message thread list + compose
+- [x] Reports page — downloadable report cards
+- [x] Donations page — payment history table
+- [x] Events page — upcoming events list
+- [x] Settings page — org profile, team members, notification preferences
+- [x] Wire all pages to real tRPC data
+
+## Phase 29: Complete System Admin Dashboard
+
+- [x] Add Overview tab — KPI grid, children/sponsorship status breakdown, 30-day signup trend chart
+- [x] Add Client Accounts tab — searchable/filterable table with plan badge, child/sponsor counts, inline plan change and verify toggle
+- [x] Add Sponsor Users tab — cross-tenant searchable table with active sponsorship count, activate/deactivate action
+- [x] Add Platform Statistics tab — recharts bar/line charts for signups, sponsors, plan distribution

@@ -4,9 +4,9 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { nanoid } from "nanoid";
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, desc, gte, lte } from "drizzle-orm";
 import { getDb } from "./db";
-import { referrals } from "../drizzle/schema";
+import { referrals, events } from "../drizzle/schema";
 import { sysAdminRouter } from "./routers/sysAdmin";
 import {
   acknowledgePolicy,
@@ -730,6 +730,114 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+  // ─── EVENTS ──────────────────────────────────────────────────────────────────
+  events: router({
+    list: protectedProcedure
+      .input(z.object({
+        tenantId: z.number(),
+        status: z.string().optional(),
+        eventType: z.string().optional(),
+        from: z.date().optional(),
+        to: z.date().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, STAFF_ROLES);
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const conditions = [eq(events.tenantId, input.tenantId)];
+        if (input.status) conditions.push(eq(events.status, input.status) as any);
+        if (input.from) conditions.push(gte(events.startDate, input.from) as any);
+        if (input.to) conditions.push(lte(events.startDate, input.to) as any);
+        return db.select().from(events).where(and(...conditions)).orderBy(desc(events.startDate)).limit(100);
+      }),
+    getById: protectedProcedure
+      .input(z.object({ id: z.number(), tenantId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, STAFF_ROLES);
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const [event] = await db.select().from(events).where(and(eq(events.id, input.id), eq(events.tenantId, input.tenantId))).limit(1);
+        if (!event) throw new TRPCError({ code: "NOT_FOUND", message: "Event not found" });
+        return event;
+      }),
+    create: protectedProcedure
+      .input(z.object({
+        tenantId: z.number(),
+        title: z.string().min(1),
+        description: z.string().optional(),
+        eventType: z.string().optional(),
+        startDate: z.date(),
+        endDate: z.date().optional(),
+        location: z.string().optional(),
+        isVirtual: z.boolean().optional(),
+        meetingUrl: z.string().optional(),
+        maxAttendees: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, MANAGER_ROLES);
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await db.insert(events).values({ ...input, createdBy: ctx.user.id, status: "upcoming" });
+        await appendAuditLog({ userId: ctx.user.id, tenantId: input.tenantId, action: "EVENT_CREATED", entityType: "event", afterValue: { title: input.title } });
+        return { success: true };
+      }),
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        tenantId: z.number(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        status: z.string().optional(),
+        startDate: z.date().optional(),
+        endDate: z.date().optional(),
+        location: z.string().optional(),
+        isVirtual: z.boolean().optional(),
+        meetingUrl: z.string().optional(),
+        maxAttendees: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, MANAGER_ROLES);
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const { id, tenantId, ...data } = input;
+        await db.update(events).set(data as any).where(and(eq(events.id, id), eq(events.tenantId, tenantId)));
+        return { success: true };
+      }),
+    delete: protectedProcedure
+      .input(z.object({ id: z.number(), tenantId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, MANAGER_ROLES);
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await db.delete(events).where(and(eq(events.id, input.id), eq(events.tenantId, input.tenantId)));
+        return { success: true };
+      }),
+  }),
+
+  // ─── REPORTS ──────────────────────────────────────────────────────────────────
+  reports: router({
+    summary: protectedProcedure
+      .input(z.object({ tenantId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, [...MANAGER_ROLES, "finance_officer", "sponsor_relations"]);
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const { children, sponsors, sponsorships, payments } = await import("../drizzle/schema");
+        const [childStats] = await db.select({ total: count(), available: count(children.id) }).from(children).where(eq(children.tenantId, input.tenantId));
+        const [sponsorStats] = await db.select({ total: count() }).from(sponsors).where(eq(sponsors.tenantId, input.tenantId));
+        const [activeSponsors] = await db.select({ total: count() }).from(sponsors).where(and(eq(sponsors.tenantId, input.tenantId), eq(sponsors.isActive, true)));
+        const [activeSponsorships] = await db.select({ total: count() }).from(sponsorships).where(and(eq(sponsorships.tenantId, input.tenantId), eq(sponsorships.status, "active")));
+        const [paymentStats] = await db.select({ total: count() }).from(payments).where(and(eq(payments.tenantId, input.tenantId), eq(payments.status, "succeeded")));
+        return {
+          totalChildren: childStats?.total ?? 0,
+          totalSponsors: sponsorStats?.total ?? 0,
+          activeSponsors: activeSponsors?.total ?? 0,
+          activeSponsorships: activeSponsorships?.total ?? 0,
+          totalPayments: paymentStats?.total ?? 0,
+        };
+      }),
+  }),
+
   sysAdmin: sysAdminRouter,
 });
 export type AppRouter = typeof appRouter;

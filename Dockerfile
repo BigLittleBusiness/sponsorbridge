@@ -10,6 +10,8 @@ WORKDIR /app
 
 # Copy manifests first for layer caching
 COPY package.json pnpm-lock.yaml ./
+# patches/ must be present before pnpm install (wouter patch is referenced in package.json)
+COPY patches ./patches
 RUN pnpm install --frozen-lockfile
 
 # Copy source and build
@@ -27,6 +29,7 @@ WORKDIR /app
 
 # Copy only production dependencies
 COPY package.json pnpm-lock.yaml ./
+COPY patches ./patches
 RUN pnpm install --frozen-lockfile --prod
 
 # Copy built output from builder

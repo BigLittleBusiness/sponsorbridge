@@ -400,6 +400,10 @@ export const customAccounts = mysqlTable("custom_accounts", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn"),
+  isSystemAdmin: boolean("isSystemAdmin").default(false).notNull(),
+  // Password reset
+  passwordResetToken: varchar("passwordResetToken", { length: 255 }),
+  passwordResetExpiresAt: timestamp("passwordResetExpiresAt"),
 });
 
 // ─── ONBOARDING CHECKLIST ───────────────────────────────────────────────────
@@ -462,6 +466,28 @@ export const passwordResetTokens = mysqlTable("password_reset_tokens", {
 });
 
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+
+// ─── EVENTS ──────────────────────────────────────────────────────────────────
+export const events = mysqlTable("events", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenant_id").notNull().references(() => tenants.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  eventType: varchar("event_type", { length: 50 }).default("general"),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  location: varchar("location", { length: 255 }),
+  isVirtual: boolean("is_virtual").default(false),
+  meetingUrl: varchar("meeting_url", { length: 500 }),
+  maxAttendees: int("max_attendees"),
+  status: varchar("status", { length: 30 }).default("upcoming"),
+  createdBy: int("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Event = typeof events.$inferSelect;
+export type InsertEvent = typeof events.$inferInsert;
 
 // ─── EXPORTS ──────────────────────────────────────────────────────────────────
 export type Tenant = typeof tenants.$inferSelect;

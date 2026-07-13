@@ -5,13 +5,13 @@
  */
 import bcrypt from "bcryptjs";
 import { Router } from "express";
-import { and, eq } from "drizzle-orm";
+import { and, eq, desc, sql, gte } from "drizzle-orm";
 import { SignJWT, jwtVerify } from "jose";
 import nodemailer from "nodemailer";
 import { z } from "zod";
 import { getDb } from "./db";
 import { nanoid } from "nanoid";
-import { customAccounts, onboardingProgress, tenants, passwordResetTokens } from "../drizzle/schema";
+import { customAccounts, onboardingProgress, tenants, passwordResetTokens, children, sponsors, sponsorships, payments, messages, vlogs } from "../drizzle/schema";
 
 const router = Router();
 
@@ -264,12 +264,13 @@ router.post("/verify-otp", async (req, res) => {
     steps.map((stepKey) => ({ accountId: account.id, stepKey }))
   );
 
-  const token = await signToken({
+    const token = await signToken({
     accountId: account.id,
     email: account.email,
     orgName: account.orgName,
     planTier: account.planTier ?? "starter",
     tenantId: account.tenantId,
+    isSystemAdmin: account.isSystemAdmin ?? false,
   });
 
   res.cookie("sb_token", token, {
@@ -290,6 +291,7 @@ router.post("/verify-otp", async (req, res) => {
       orgName: account.orgName,
       planTier: account.planTier,
       onboardingCompletedAt: account.onboardingCompletedAt,
+      isSystemAdmin: account.isSystemAdmin ?? false,
     },
   });
 });
@@ -354,12 +356,13 @@ router.post("/login", async (req, res) => {
 
   await db.update(customAccounts).set({ lastSignedIn: new Date() }).where(eq(customAccounts.id, account.id));
 
-  const token = await signToken({
+    const token = await signToken({
     accountId: account.id,
     email: account.email,
     orgName: account.orgName,
     planTier: account.planTier ?? "starter",
     tenantId: account.tenantId,
+    isSystemAdmin: account.isSystemAdmin ?? false,
   });
 
   res.cookie("sb_token", token, {
@@ -380,6 +383,7 @@ router.post("/login", async (req, res) => {
       orgName: account.orgName,
       planTier: account.planTier,
       onboardingCompletedAt: account.onboardingCompletedAt,
+      isSystemAdmin: account.isSystemAdmin ?? false,
     },
   });
 });
@@ -405,6 +409,7 @@ router.get("/me-custom", async (req, res) => {
       planTier: customAccounts.planTier,
       onboardingCompletedAt: customAccounts.onboardingCompletedAt,
       tenantId: customAccounts.tenantId,
+      isSystemAdmin: customAccounts.isSystemAdmin,
     })
     .from(customAccounts)
     .where(eq(customAccounts.id, payload.accountId))
@@ -600,6 +605,120 @@ router.get("/validate-reset-token", async (req, res) => {
     return res.json({ valid: false });
   }
   return res.json({ valid: true });
+});
+
+/** GET /api/auth/org-dashboard-stats */
+router.get("/org-dashboard-stats", async (req, res) => {
+  const token = req.cookies?.sb_token;
+  if (!token) return res.status(401).json({ error: "Unauthorised" });
+  const payload = await verifyCustomToken(token);
+  if (!payload) return res.status(401).json({ error: "Invalid token" });
+  const db = await getDb();
+  if (!db) return res.status(503).json({ error: "DB unavailable" });
+  const [account] = await db.select({ tenantId: customAccounts.tenantId })
+    .from(customAccounts).where(eq(customAccounts.id, payload.accountId)).limit(1);
+  if (!account?.tenantId) return res.status(404).json({ error: "Tenant not found" });
+  const tenantId = account.tenantId;
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const [[totalSponsors], [totalChildren], [activeSponsorships], [availableChildren],
+    [sponsoredChildren], [pendingVlogs], [pendingMessages], revenueResult,
+    [newSponsors30d], [newChildren30d]] = await Promise.all([
+    db.select({ count: sql<number>`count(*)` }).from(sponsors).where(and(eq(sponsors.tenantId, tenantId), eq(sponsors.isActive, true))),
+    db.select({ count: sql<number>`count(*)` }).from(children).where(and(eq(children.tenantId, tenantId), eq(children.isActive, true))),
+    db.select({ count: sql<number>`count(*)` }).from(sponsorships).where(and(eq(sponsorships.tenantId, tenantId), eq(sponsorships.status, "active"))),
+    db.select({ count: sql<number>`count(*)` }).from(children).where(and(eq(children.tenantId, tenantId), eq(children.status, "AVAILABLE"))),
+    db.select({ count: sql<number>`count(*)` }).from(children).where(and(eq(children.tenantId, tenantId), eq(children.status, "SPONSORED"))),
+    db.select({ count: sql<number>`count(*)` }).from(vlogs).where(and(eq(vlogs.tenantId, tenantId), eq(vlogs.status, "pending_review"))),
+    db.select({ count: sql<number>`count(*)` }).from(messages).where(and(eq(messages.tenantId, tenantId), eq(messages.status, "pending_approval"))),
+    db.select({ total: sql<number>`coalesce(sum(amount),0)` }).from(payments).where(and(eq(payments.tenantId, tenantId), eq(payments.status, "succeeded"))),
+    db.select({ count: sql<number>`count(*)` }).from(sponsors).where(and(eq(sponsors.tenantId, tenantId), gte(sponsors.createdAt, thirtyDaysAgo))),
+    db.select({ count: sql<number>`count(*)` }).from(children).where(and(eq(children.tenantId, tenantId), gte(children.createdAt, thirtyDaysAgo))),
+  ]);
+  const total = Number(totalChildren?.count ?? 0);
+  const sponsored = Number(sponsoredChildren?.count ?? 0);
+  const retentionPct = total > 0 ? Math.round((sponsored / total) * 100) : 0;
+  return res.json({
+    totalSponsors: Number(totalSponsors?.count ?? 0),
+    totalChildren: total,
+    activeSponsorships: Number(activeSponsorships?.count ?? 0),
+    availableChildren: Number(availableChildren?.count ?? 0),
+    sponsoredChildren: sponsored,
+    pendingVlogs: Number(pendingVlogs?.count ?? 0),
+    pendingMessages: Number(pendingMessages?.count ?? 0),
+    totalRevenueCents: Number(revenueResult[0]?.total ?? 0),
+    newSponsors30d: Number(newSponsors30d?.count ?? 0),
+    newChildren30d: Number(newChildren30d?.count ?? 0),
+    retentionPct,
+  });
+});
+
+/** GET /api/auth/org-recent-activity */
+router.get("/org-recent-activity", async (req, res) => {
+  const token = req.cookies?.sb_token;
+  if (!token) return res.status(401).json({ error: "Unauthorised" });
+  const payload = await verifyCustomToken(token);
+  if (!payload) return res.status(401).json({ error: "Invalid token" });
+  const db = await getDb();
+  if (!db) return res.status(503).json({ error: "DB unavailable" });
+  const [account] = await db.select({ tenantId: customAccounts.tenantId })
+    .from(customAccounts).where(eq(customAccounts.id, payload.accountId)).limit(1);
+  if (!account?.tenantId) return res.status(404).json({ error: "Tenant not found" });
+  const tenantId = account.tenantId;
+  const [recentSponsors, recentChildren, recentPayments, recentMessages] = await Promise.all([
+    db.select({ id: sponsors.id, firstName: sponsors.firstName, lastName: sponsors.lastName, createdAt: sponsors.createdAt })
+      .from(sponsors).where(eq(sponsors.tenantId, tenantId)).orderBy(desc(sponsors.createdAt)).limit(5),
+    db.select({ id: children.id, firstName: children.firstName, lastName: children.lastName, createdAt: children.createdAt })
+      .from(children).where(eq(children.tenantId, tenantId)).orderBy(desc(children.createdAt)).limit(5),
+    db.select({ id: payments.id, amount: payments.amount, currency: payments.currency, paidAt: payments.paidAt, createdAt: payments.createdAt })
+      .from(payments).where(and(eq(payments.tenantId, tenantId), eq(payments.status, "succeeded"))).orderBy(desc(payments.paidAt)).limit(5),
+    db.select({ id: messages.id, createdAt: messages.createdAt })
+      .from(messages).where(eq(messages.tenantId, tenantId)).orderBy(desc(messages.createdAt)).limit(5),
+  ]);
+  const activities = [
+    ...recentSponsors.map(s => ({ type: "sponsor_registered", label: `New sponsor registered: ${s.firstName} ${s.lastName}`, at: s.createdAt })),
+    ...recentChildren.map(c => ({ type: "child_added", label: `Child profile added: ${c.firstName} ${c.lastName}`, at: c.createdAt })),
+    ...recentPayments.map(p => ({ type: "payment_received", label: `Payment received: ${(p.currency ?? "USD").toUpperCase()} ${((p.amount ?? 0) / 100).toFixed(2)}`, at: p.paidAt ?? p.createdAt })),
+    ...recentMessages.map(m => ({ type: "message", label: "Message from sponsor received", at: m.createdAt })),
+  ].sort((a, b) => new Date(b.at ?? 0).getTime() - new Date(a.at ?? 0).getTime()).slice(0, 8);
+  return res.json({ activities });
+});
+
+/** GET /api/auth/org-spotlight-child */
+router.get("/org-spotlight-child", async (req, res) => {
+  const token = req.cookies?.sb_token;
+  if (!token) return res.status(401).json({ error: "Unauthorised" });
+  const payload = await verifyCustomToken(token);
+  if (!payload) return res.status(401).json({ error: "Invalid token" });
+  const db = await getDb();
+  if (!db) return res.status(503).json({ error: "DB unavailable" });
+  const [account] = await db.select({ tenantId: customAccounts.tenantId })
+    .from(customAccounts).where(eq(customAccounts.id, payload.accountId)).limit(1);
+  if (!account?.tenantId) return res.status(404).json({ error: "Tenant not found" });
+  const tenantId = account.tenantId;
+  const [child] = await db.select({
+    id: children.id, firstName: children.firstName, lastName: children.lastName,
+    dateOfBirth: children.dateOfBirth, gender: children.gender, country: children.country,
+    programType: children.programType, status: children.status, photoUrl: children.photoUrl,
+  }).from(children)
+    .where(and(eq(children.tenantId, tenantId), eq(children.status, "SPONSORED")))
+    .orderBy(desc(children.createdAt)).limit(1);
+  if (!child) {
+    const [anyChild] = await db.select({
+      id: children.id, firstName: children.firstName, lastName: children.lastName,
+      dateOfBirth: children.dateOfBirth, gender: children.gender, country: children.country,
+      programType: children.programType, status: children.status, photoUrl: children.photoUrl,
+    }).from(children).where(and(eq(children.tenantId, tenantId), eq(children.isActive, true))).limit(1);
+    return res.json({ child: anyChild ?? null });
+  }
+  const [sponsorship] = await db.select({ sponsorId: sponsorships.sponsorId })
+    .from(sponsorships).where(and(eq(sponsorships.childId, child.id), eq(sponsorships.status, "active"))).limit(1);
+  let sponsorName = null;
+  if (sponsorship?.sponsorId) {
+    const [sponsor] = await db.select({ firstName: sponsors.firstName, lastName: sponsors.lastName })
+      .from(sponsors).where(eq(sponsors.id, sponsorship.sponsorId)).limit(1);
+    if (sponsor) sponsorName = `${sponsor.firstName} ${sponsor.lastName}`;
+  }
+  return res.json({ child: { ...child, sponsorName } });
 });
 
 export { router as customAuthRouter };

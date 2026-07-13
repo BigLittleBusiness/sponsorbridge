@@ -14,6 +14,7 @@ export interface CustomAccount {
   planTier: string;
   onboardingCompletedAt: string | null;
   tenantId: number | null;
+  isSystemAdmin: boolean;
 }
 
 interface CustomAuthState {

@@ -34,7 +34,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useRouter } from "wouter";
 
 interface NavItem {
@@ -238,10 +238,12 @@ export default function SponsorBridgeLayout({ children }: { children: React.Reac
 
   // Policy acknowledgment gate — redirect to /policy if user hasn't acknowledged
   const needsPolicyAck = isAuthenticated && user && !user.policyAcknowledgedAt;
-  if (!loading && needsPolicyAck && typeof window !== "undefined" && window.location.pathname !== "/policy") {
-    navigate("/policy");
-    return null;
-  }
+  useEffect(() => {
+    if (!loading && needsPolicyAck && window.location.pathname !== "/policy") {
+      navigate("/policy");
+    }
+  }, [loading, needsPolicyAck]);
+  if (!loading && needsPolicyAck) return null;
 
   if (loading) {
     return (

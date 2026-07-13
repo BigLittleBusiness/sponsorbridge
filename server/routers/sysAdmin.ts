@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { eq, desc, and, isNull, sql } from "drizzle-orm";
+import { eq, desc, and, isNull, sql, gte, like, or } from "drizzle-orm";
 import { router, protectedProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
@@ -11,6 +11,9 @@ import {
   auditLogs,
   payments,
   customAccounts,
+  children,
+  sponsors,
+  sponsorships,
 } from "../../drizzle/schema";
 
 // Only system_admin role can access these procedures
@@ -257,5 +260,253 @@ export const sysAdminRouter = router({
         .orderBy(desc(customAccounts.createdAt))
         .limit(input.limit)
         .offset(input.offset);
+    }),
+
+  // ── PLATFORM OVERVIEW (new holistic stats) ────────────────────────────────
+  getPlatformOverview: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    const [[totalOrgs], [totalSponsors], [totalChildren], [activeSpons], [activeSponsorships],
+      [newOrgs30d], [newSponsors30d], [totalPayments], [recentPayments]] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` }).from(customAccounts),
+      db.select({ count: sql<number>`count(*)` }).from(sponsors),
+      db.select({ count: sql<number>`count(*)` }).from(children),
+      db.select({ count: sql<number>`count(*)` }).from(sponsors).where(eq(sponsors.isActive, true)),
+      db.select({ count: sql<number>`count(*)` }).from(sponsorships).where(eq(sponsorships.status, "active")),
+      db.select({ count: sql<number>`count(*)` }).from(customAccounts).where(gte(customAccounts.createdAt, thirtyDaysAgo)),
+      db.select({ count: sql<number>`count(*)` }).from(sponsors).where(gte(sponsors.createdAt, thirtyDaysAgo)),
+      db.select({ total: sql<number>`coalesce(sum(amount),0)` }).from(payments).where(eq(payments.status, "succeeded")),
+      db.select({ total: sql<number>`coalesce(sum(amount),0)` }).from(payments).where(and(eq(payments.status, "succeeded"), gte(payments.paidAt, thirtyDaysAgo))),
+    ]);
+
+    // Children by status
+    const childrenByStatus = await db.select({
+      status: children.status,
+      count: sql<number>`count(*)`,
+    }).from(children).groupBy(children.status);
+
+    // Sponsorships by status
+    const sponsorshipsByStatus = await db.select({
+      status: sponsorships.status,
+      count: sql<number>`count(*)`,
+    }).from(sponsorships).groupBy(sponsorships.status);
+
+    // Signups per day for last 30 days (client orgs)
+    const signupTrend = await db.select({
+      day: sql<string>`DATE(${customAccounts.createdAt})`,
+      count: sql<number>`count(*)`,
+    }).from(customAccounts)
+      .where(gte(customAccounts.createdAt, thirtyDaysAgo))
+      .groupBy(sql`DATE(${customAccounts.createdAt})`)
+      .orderBy(sql`DATE(${customAccounts.createdAt})`);
+
+    // New sponsors per day for last 30 days
+    const sponsorTrend = await db.select({
+      day: sql<string>`DATE(${sponsors.createdAt})`,
+      count: sql<number>`count(*)`,
+    }).from(sponsors)
+      .where(gte(sponsors.createdAt, thirtyDaysAgo))
+      .groupBy(sql`DATE(${sponsors.createdAt})`)
+      .orderBy(sql`DATE(${sponsors.createdAt})`);
+
+    // Accounts verified vs unverified
+    const [verifiedCount] = await db.select({ count: sql<number>`count(*)` })
+      .from(customAccounts).where(eq(customAccounts.isVerified, true));
+
+    // Active users in last 7 days
+    const [activeUsers7d] = await db.select({ count: sql<number>`count(*)` })
+      .from(customAccounts).where(gte(customAccounts.lastSignedIn, sevenDaysAgo));
+
+    return {
+      totalOrgs: Number(totalOrgs?.count ?? 0),
+      totalSponsors: Number(totalSponsors?.count ?? 0),
+      totalChildren: Number(totalChildren?.count ?? 0),
+      activeSponsors: Number(activeSpons?.count ?? 0),
+      activeSponsorships: Number(activeSponsorships?.count ?? 0),
+      newOrgs30d: Number(newOrgs30d?.count ?? 0),
+      newSponsors30d: Number(newSponsors30d?.count ?? 0),
+      allTimeRevenueCents: Number(totalPayments?.total ?? 0),
+      last30DaysRevenueCents: Number(recentPayments?.total ?? 0),
+      verifiedOrgs: Number(verifiedCount?.count ?? 0),
+      activeUsers7d: Number(activeUsers7d?.count ?? 0),
+      childrenByStatus: childrenByStatus.map(r => ({ status: r.status, count: Number(r.count) })),
+      sponsorshipsByStatus: sponsorshipsByStatus.map(r => ({ status: r.status, count: Number(r.count) })),
+      signupTrend: signupTrend.map(r => ({ day: r.day, count: Number(r.count) })),
+      sponsorTrend: sponsorTrend.map(r => ({ day: r.day, count: Number(r.count) })),
+    };
+  }),
+
+  // ── CLIENT ACCOUNTS — searchable/filterable ───────────────────────────────
+  searchAccounts: adminProcedure
+    .input(z.object({
+      search: z.string().optional(),
+      planTier: z.enum(["starter", "growth", "professional", "enterprise"]).optional(),
+      isVerified: z.boolean().optional(),
+      limit: z.number().min(1).max(100).default(50),
+      offset: z.number().default(0),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      const conditions: any[] = [];
+      if (input.search) {
+        conditions.push(or(
+          like(customAccounts.orgName, `%${input.search}%`),
+          like(customAccounts.email, `%${input.search}%`),
+          like(customAccounts.firstName, `%${input.search}%`),
+          like(customAccounts.lastName, `%${input.search}%`),
+        ));
+      }
+      if (input.planTier) conditions.push(eq(customAccounts.planTier, input.planTier));
+      if (input.isVerified !== undefined) conditions.push(eq(customAccounts.isVerified, input.isVerified));
+
+      const rows = await db.select({
+        id: customAccounts.id,
+        orgName: customAccounts.orgName,
+        orgCountry: customAccounts.orgCountry,
+        orgSize: customAccounts.orgSize,
+        email: customAccounts.email,
+        firstName: customAccounts.firstName,
+        lastName: customAccounts.lastName,
+        jobTitle: customAccounts.jobTitle,
+        planTier: customAccounts.planTier,
+        isVerified: customAccounts.isVerified,
+        createdAt: customAccounts.createdAt,
+        lastSignedIn: customAccounts.lastSignedIn,
+        onboardingCompletedAt: customAccounts.onboardingCompletedAt,
+        tenantId: customAccounts.tenantId,
+      }).from(customAccounts)
+        .where(conditions.length ? and(...conditions) : undefined)
+        .orderBy(desc(customAccounts.createdAt))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      // Enrich with per-tenant counts
+      const enriched = await Promise.all(rows.map(async (acc) => {
+        if (!acc.tenantId) return { ...acc, childCount: 0, sponsorCount: 0, activeSponsorships: 0 };
+        const [[childCount], [sponsorCount], [activeSponsorshipCount]] = await Promise.all([
+          db.select({ count: sql<number>`count(*)` }).from(children).where(eq(children.tenantId, acc.tenantId)),
+          db.select({ count: sql<number>`count(*)` }).from(sponsors).where(eq(sponsors.tenantId, acc.tenantId)),
+          db.select({ count: sql<number>`count(*)` }).from(sponsorships).where(and(eq(sponsorships.tenantId, acc.tenantId), eq(sponsorships.status, "active"))),
+        ]);
+        return {
+          ...acc,
+          childCount: Number(childCount?.count ?? 0),
+          sponsorCount: Number(sponsorCount?.count ?? 0),
+          activeSponsorships: Number(activeSponsorshipCount?.count ?? 0),
+        };
+      }));
+
+      const [totalRow] = await db.select({ count: sql<number>`count(*)` })
+        .from(customAccounts)
+        .where(conditions.length ? and(...conditions) : undefined);
+
+      return { rows: enriched, total: Number(totalRow?.count ?? 0) };
+    }),
+
+  // ── UPDATE ACCOUNT PLAN / VERIFIED STATUS ─────────────────────────────────
+  updateAccount: adminProcedure
+    .input(z.object({
+      accountId: z.number(),
+      planTier: z.enum(["starter", "growth", "professional", "enterprise"]).optional(),
+      isVerified: z.boolean().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      const updates: Record<string, any> = {};
+      if (input.planTier !== undefined) updates.planTier = input.planTier;
+      if (input.isVerified !== undefined) updates.isVerified = input.isVerified;
+      if (Object.keys(updates).length === 0) return { success: true };
+      await db.update(customAccounts).set(updates).where(eq(customAccounts.id, input.accountId));
+      await db.insert(auditLogs).values({
+        userId: ctx.user.id,
+        userEmail: ctx.user.email ?? undefined,
+        action: "account_updated",
+        entityType: "custom_accounts",
+        entityId: String(input.accountId),
+        afterValue: updates,
+      });
+      return { success: true };
+    }),
+
+  // ── SPONSOR USERS — cross-tenant list ────────────────────────────────────
+  listSponsors: adminProcedure
+    .input(z.object({
+      search: z.string().optional(),
+      isActive: z.boolean().optional(),
+      limit: z.number().min(1).max(100).default(50),
+      offset: z.number().default(0),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      const conditions: any[] = [];
+      if (input.search) {
+        conditions.push(or(
+          like(sponsors.firstName, `%${input.search}%`),
+          like(sponsors.lastName, `%${input.search}%`),
+          like(sponsors.email, `%${input.search}%`),
+          like(sponsors.country, `%${input.search}%`),
+        ));
+      }
+      if (input.isActive !== undefined) conditions.push(eq(sponsors.isActive, input.isActive));
+
+      const rows = await db.select({
+        id: sponsors.id,
+        tenantId: sponsors.tenantId,
+        firstName: sponsors.firstName,
+        lastName: sponsors.lastName,
+        email: sponsors.email,
+        country: sponsors.country,
+        isActive: sponsors.isActive,
+        createdAt: sponsors.createdAt,
+        stripeCustomerId: sponsors.stripeCustomerId,
+      }).from(sponsors)
+        .where(conditions.length ? and(...conditions) : undefined)
+        .orderBy(desc(sponsors.createdAt))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      // Enrich with active sponsorship count and tenant name
+      const enriched = await Promise.all(rows.map(async (s) => {
+        const [[sponsorshipCount], tenant] = await Promise.all([
+          db.select({ count: sql<number>`count(*)` }).from(sponsorships)
+            .where(and(eq(sponsorships.sponsorId, s.id), eq(sponsorships.status, "active"))),
+          db.select({ name: tenants.name }).from(tenants).where(eq(tenants.id, s.tenantId)).limit(1),
+        ]);
+        return {
+          ...s,
+          activeSponsorships: Number(sponsorshipCount?.count ?? 0),
+          tenantName: tenant[0]?.name ?? "Unknown",
+        };
+      }));
+
+      const [totalRow] = await db.select({ count: sql<number>`count(*)` })
+        .from(sponsors)
+        .where(conditions.length ? and(...conditions) : undefined);
+
+      return { rows: enriched, total: Number(totalRow?.count ?? 0) };
+    }),
+
+  // ── TOGGLE SPONSOR ACTIVE STATUS ─────────────────────────────────────────
+  updateSponsorStatus: adminProcedure
+    .input(z.object({ sponsorId: z.number(), isActive: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      await db.update(sponsors).set({ isActive: input.isActive }).where(eq(sponsors.id, input.sponsorId));
+      await db.insert(auditLogs).values({
+        userId: ctx.user.id,
+        userEmail: ctx.user.email ?? undefined,
+        action: input.isActive ? "sponsor_activated" : "sponsor_deactivated",
+        entityType: "sponsors",
+        entityId: String(input.sponsorId),
+      });
+      return { success: true };
     }),
 });

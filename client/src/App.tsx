@@ -51,6 +51,12 @@ import PaymentsPage from "./pages/payments/PaymentsPage";
 // Analytics
 import AnalyticsDashboard from "./pages/analytics/AnalyticsDashboard";
 
+// Events
+import EventsPage from "./pages/events/EventsPage";
+
+// Reports
+import ReportsPage from "./pages/reports/ReportsPage";
+
 // Sponsor impact dashboard
 import SponsorImpactDashboard from "./pages/sponsors/SponsorImpactDashboard";
 
@@ -128,6 +134,12 @@ function Router() {
 
       {/* Analytics */}
       <Route path="/analytics" component={AnalyticsDashboard} />
+
+      {/* Events */}
+      <Route path="/events" component={EventsPage} />
+
+      {/* Reports */}
+      <Route path="/reports" component={ReportsPage} />
 
       {/* Safeguarding */}
       <Route path="/safeguarding/incidents" component={IncidentsList} />
