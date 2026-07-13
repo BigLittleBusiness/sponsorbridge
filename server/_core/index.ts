@@ -11,6 +11,7 @@ import { serveStatic, setupVite } from "./vite";
 import { onboardingHeartbeatHandler } from "../scheduled/onboarding";
 import { registerStripeRoutes } from "../stripe";
 import { customAuthRouter } from "../customAuth";
+import { sponsorAuthRouter } from "../sponsorAuth";
 import cookieParser from "cookie-parser";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -48,6 +49,9 @@ async function startServer() {
 
   // Custom auth routes (registration, OTP, login for charity admins)
   app.use("/api/auth", customAuthRouter);
+
+  // Sponsor portal auth + data routes
+  app.use("/api/sponsor", sponsorAuthRouter);
 
   // Scheduled heartbeat handlers — must be before Vite/static fallthrough
   app.post("/api/scheduled/onboarding", onboardingHeartbeatHandler);

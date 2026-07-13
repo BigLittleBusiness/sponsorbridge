@@ -254,3 +254,28 @@
 - [x] Add Client Accounts tab — searchable/filterable table with plan badge, child/sponsor counts, inline plan change and verify toggle
 - [x] Add Sponsor Users tab — cross-tenant searchable table with active sponsorship count, activate/deactivate action
 - [x] Add Platform Statistics tab — recharts bar/line charts for signups, sponsors, plan distribution
+
+## Phase 30: Sponsor Self-Service Portal
+
+- [x] DB migration: sponsor_portal_accounts table (email, password hash, OTP, isActive, isVerified)
+- [x] DB migration: child_updates table (title, content, updateType, mediaUrl, publishedAt, isPublished)
+- [x] Backend router: POST /api/sponsor/login (email/password + OTP magic link)
+- [x] Backend router: POST /api/sponsor/verify-otp
+- [x] Backend router: POST /api/sponsor/logout
+- [x] Backend router: GET /api/sponsor/me (sponsor profile + active sponsorships)
+- [x] Backend router: GET /api/sponsor/dashboard (KPI cards + recent updates)
+- [x] Backend router: GET /api/sponsor/child/:childId (full profile + updates history)
+- [x] Backend router: GET /api/sponsor/payments (payment history + total donated)
+- [x] Backend router: GET /api/sponsor/messages (message thread)
+- [x] Backend router: POST /api/sponsor/messages (send message, goes to moderation queue)
+- [x] Backend router: PUT /api/sponsor/profile (notification preferences)
+- [x] SponsorAuthContext.tsx — auth state, login/OTP/logout/refresh
+- [x] SponsorPortalLayout.tsx — warm cream/terracotta sidebar layout
+- [x] SponsorLoginPage.tsx — split-screen login with password + OTP magic code modes
+- [x] SponsorDashboard.tsx — KPI cards, child card, recent updates feed
+- [x] SponsorChildPage.tsx — full child profile with filterable updates history
+- [x] SponsorMessagesPage.tsx — message thread + compose with moderation notice
+- [x] SponsorPaymentsPage.tsx — payment history table + manage subscription + CSV export
+- [x] SponsorProfilePage.tsx — account details + notification preferences + privacy
+- [x] App.tsx — sponsor portal routes (/sponsor/*) + SponsorAuthProvider wrapper
+- [x] All TypeScript errors resolved, 27 tests passing

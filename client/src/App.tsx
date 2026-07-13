@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CustomAuthProvider } from "./contexts/CustomAuthContext";
+import { SponsorAuthProvider } from "./contexts/SponsorAuthContext";
 
 // Public pages
 import Home from "./pages/Home";
@@ -69,6 +70,14 @@ import ConsentManager from "./pages/safeguarding/ConsentManager";
 
 // Community
 import CommunityPage from "./pages/community/CommunityPage";
+
+// Sponsor portal
+import SponsorLoginPage from "./pages/sponsor/SponsorLoginPage";
+import SponsorDashboard from "./pages/sponsor/SponsorDashboard";
+import SponsorChildPage from "./pages/sponsor/SponsorChildPage";
+import SponsorMessagesPage from "./pages/sponsor/SponsorMessagesPage";
+import SponsorPaymentsPage from "./pages/sponsor/SponsorPaymentsPage";
+import SponsorProfilePage from "./pages/sponsor/SponsorProfilePage";
 
 // System Admin
 import SystemAdminDashboard from "./pages/admin/SystemAdminDashboard";
@@ -151,6 +160,14 @@ function Router() {
       {/* Community & Ambassador */}
       <Route path="/community" component={CommunityPage} />
 
+      {/* Sponsor portal */}
+      <Route path="/sponsor/login" component={SponsorLoginPage} />
+      <Route path="/sponsor/dashboard" component={SponsorDashboard} />
+      <Route path="/sponsor/child" component={SponsorChildPage} />
+      <Route path="/sponsor/messages" component={SponsorMessagesPage} />
+      <Route path="/sponsor/payments" component={SponsorPaymentsPage} />
+      <Route path="/sponsor/profile" component={SponsorProfilePage} />
+
       {/* System Admin */}
       <Route path="/admin" component={SystemAdminDashboard} />
 
@@ -170,10 +187,12 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
         <CustomAuthProvider>
+          <SponsorAuthProvider>
           <TooltipProvider>
             <Toaster />
             <Router />
           </TooltipProvider>
+          </SponsorAuthProvider>
         </CustomAuthProvider>
       </ThemeProvider>
     </ErrorBoundary>

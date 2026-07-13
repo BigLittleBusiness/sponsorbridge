@@ -489,6 +489,51 @@ export const events = mysqlTable("events", {
 export type Event = typeof events.$inferSelect;
 export type InsertEvent = typeof events.$inferInsert;
 
+// ─── SPONSOR PORTAL ACCOUNTS ─────────────────────────────────────────────────
+// Sponsors log in via their own portal (separate from org admin accounts).
+export const sponsorPortalAccounts = mysqlTable("sponsor_portal_accounts", {
+  id: int("id").autoincrement().primaryKey(),
+  sponsorId: int("sponsorId").notNull().references(() => sponsors.id),
+  tenantId: int("tenantId").notNull().references(() => tenants.id),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  passwordHash: varchar("passwordHash", { length: 255 }),
+  otpCode: varchar("otpCode", { length: 10 }),
+  otpExpiresAt: timestamp("otpExpiresAt"),
+  otpAttempts: int("otpAttempts").default(0),
+  isVerified: boolean("isVerified").default(false),
+  isActive: boolean("isActive").default(true),
+  lastLoginAt: timestamp("lastLoginAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// ─── CHILD UPDATES ────────────────────────────────────────────────────────────
+// Progress updates posted by org staff about a child, visible to their sponsor.
+export const childUpdates = mysqlTable("child_updates", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull().references(() => tenants.id),
+  childId: int("childId").notNull().references(() => children.id),
+  sponsorshipId: int("sponsorshipId").references(() => sponsorships.id),
+  postedById: int("postedById").notNull().references(() => users.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  updateType: mysqlEnum("updateType", [
+    "general",
+    "education",
+    "health",
+    "milestone",
+    "photo",
+    "letter",
+    "video",
+  ]).default("general").notNull(),
+  mediaUrl: text("mediaUrl"),
+  mediaKey: varchar("mediaKey", { length: 500 }),
+  isPublished: boolean("isPublished").default(true),
+  publishedAt: timestamp("publishedAt").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 // ─── EXPORTS ──────────────────────────────────────────────────────────────────
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = typeof tenants.$inferInsert;

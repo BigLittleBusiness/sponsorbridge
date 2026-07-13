@@ -34,6 +34,8 @@ RUN pnpm install --frozen-lockfile --prod
 
 # Copy built output from builder
 COPY --from=builder /app/dist ./dist
+# The Vite client build lands in dist/public; serveStatic looks for dist/public relative to dist/index.js
+# which resolves to /app/dist/public — already correct from the above COPY
 
 # Expose the app port (Cloud Run / ECS will inject PORT env var)
 EXPOSE 3000
