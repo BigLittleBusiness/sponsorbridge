@@ -35,15 +35,6 @@ RUN pnpm install --frozen-lockfile --prod
 # Copy built output from builder
 COPY --from=builder /app/dist ./dist
 
-# Copy server source (tRPC server runs from source via tsx in prod)
-COPY --from=builder /app/server ./server
-COPY --from=builder /app/shared ./shared
-COPY --from=builder /app/drizzle ./drizzle
-COPY --from=builder /app/tsconfig.json ./
-
-# Install tsx for server runtime
-RUN pnpm add -D tsx
-
 # Expose the app port (Cloud Run / ECS will inject PORT env var)
 EXPOSE 3000
 
@@ -51,5 +42,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget -qO- http://localhost:${PORT:-3000}/api/health || exit 1
 
-# Start the server
-CMD ["node", "--loader", "tsx", "server/_core/index.ts"]
+# Start the pre-built server bundle (avoids tsx --loader which is removed in Node 22)
+CMD ["node", "dist/index.js"]

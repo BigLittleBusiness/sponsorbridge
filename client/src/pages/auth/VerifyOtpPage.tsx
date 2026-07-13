@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,13 @@ export default function VerifyOtpPage() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [cooldown]);
   const { refetch } = useCustomAuth();
   const [, navigate] = useLocation();
 
@@ -45,6 +52,7 @@ export default function VerifyOtpPage() {
       const data = await res.json();
       if (res.ok) toast.success("A new code has been sent");
       else toast.error(data.error ?? "Could not resend code");
+      if (res.ok) setCooldown(60);
     } finally {
       setResending(false);
     }
@@ -109,11 +117,11 @@ export default function VerifyOtpPage() {
           <p className="text-sm text-muted-foreground">
             Didn't receive it?{" "}
             <button
-              className="text-terracotta hover:underline font-medium"
+              className="text-terracotta hover:underline font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleResend}
-              disabled={resending}
+              disabled={resending || cooldown > 0}
             >
-              {resending ? "Sending..." : "Resend code"}
+              {resending ? "Sending..." : cooldown > 0 ? `Resend in ${cooldown}s` : "Resend code"}
             </button>
           </p>
           <p className="text-xs text-muted-foreground">Code expires in 15 minutes</p>
