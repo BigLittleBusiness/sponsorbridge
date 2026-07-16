@@ -8,6 +8,7 @@ import { eq, and, count, desc, gte, lte } from "drizzle-orm";
 import { getDb } from "./db";
 import { referrals, events } from "../drizzle/schema";
 import { sysAdminRouter } from "./routers/sysAdmin";
+import { projectsRouter } from "./routers/projects";
 import {
   acknowledgePolicy,
   appendAuditLog,
@@ -897,5 +898,6 @@ export const appRouter = router({
   }),
 
   sysAdmin: sysAdminRouter,
+  projects: projectsRouter,
 });
 export type AppRouter = typeof appRouter;

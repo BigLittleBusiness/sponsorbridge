@@ -20,6 +20,7 @@ import {
   ChevronDown,
   ClipboardList,
   FileText,
+  FolderHeart,
   Heart,
   Home,
   LogOut,
@@ -54,6 +55,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Messages", href: "/messages", icon: MessageSquare, roles: ["system_admin", "program_manager", "safeguarding_officer", "sponsor_relations", "admin"] },
   { label: "Payments", href: "/payments", icon: Wallet, roles: ["system_admin", "finance_officer", "program_manager", "admin"] },
   { label: "Analytics", href: "/analytics", icon: BarChart3, roles: ["system_admin", "program_manager", "sponsor_relations", "finance_officer", "admin"] },
+  { label: "Projects", href: "/projects", icon: FolderHeart, roles: ["system_admin", "program_manager", "finance_officer", "sponsor_relations", "admin"] },
   { label: "Community", href: "/community", icon: Share2 },
 ];
 

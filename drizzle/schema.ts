@@ -534,6 +534,93 @@ export const childUpdates = mysqlTable("child_updates", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+// ─── PROJECTS ───────────────────────────────────────────────────────────────
+// Charity-created fundraising campaigns for items, infrastructure, or events.
+export const projects = mysqlTable("projects", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull().references(() => tenants.id),
+  createdById: int("createdById").notNull().references(() => users.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  shortDescription: varchar("shortDescription", { length: 500 }),
+  category: mysqlEnum("category", [
+    "infrastructure",
+    "education",
+    "equipment",
+    "event",
+    "emergency",
+    "health",
+    "other",
+  ]).default("other").notNull(),
+  goalAmountCents: int("goalAmountCents").notNull(),
+  raisedAmountCents: int("raisedAmountCents").default(0).notNull(),
+  currency: varchar("currency", { length: 3 }).default("AUD").notNull(),
+  coverImageUrl: text("coverImageUrl"),
+  coverImageKey: varchar("coverImageKey", { length: 500 }),
+  status: mysqlEnum("status", [
+    "draft",
+    "active",
+    "funded",
+    "completed",
+    "cancelled",
+  ]).default("draft").notNull(),
+  isPublic: boolean("isPublic").default(false),
+  allowRecurring: boolean("allowRecurring").default(true),
+  showDonorWall: boolean("showDonorWall").default(true),
+  deadlineAt: timestamp("deadlineAt"),
+  completedAt: timestamp("completedAt"),
+  stripeProductId: varchar("stripeProductId", { length: 255 }),
+  stripePriceId: varchar("stripePriceId", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// ─── PROJECT CONTRIBUTIONS ────────────────────────────────────────────────────
+// Individual sponsor contributions toward a project (one-off or recurring).
+export const projectContributions = mysqlTable("project_contributions", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull().references(() => tenants.id),
+  projectId: int("projectId").notNull().references(() => projects.id),
+  sponsorId: int("sponsorId").references(() => sponsors.id),
+  // Guest (non-registered) donor fields
+  guestName: varchar("guestName", { length: 255 }),
+  guestEmail: varchar("guestEmail", { length: 320 }),
+  amountCents: int("amountCents").notNull(),
+  currency: varchar("currency", { length: 3 }).default("AUD").notNull(),
+  isRecurring: boolean("isRecurring").default(false),
+  isAnonymous: boolean("isAnonymous").default(false),
+  message: text("message"),
+  status: mysqlEnum("status", [
+    "pending",
+    "succeeded",
+    "failed",
+    "refunded",
+  ]).default("pending").notNull(),
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  paidAt: timestamp("paidAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// ─── PROJECT UPDATES ──────────────────────────────────────────────────────────
+// Staff-posted progress updates for a project, visible to contributors.
+export const projectUpdates = mysqlTable("project_updates", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull().references(() => tenants.id),
+  projectId: int("projectId").notNull().references(() => projects.id),
+  postedById: int("postedById").notNull().references(() => users.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  mediaUrl: text("mediaUrl"),
+  isPublished: boolean("isPublished").default(true),
+  publishedAt: timestamp("publishedAt").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 // ─── EXPORTS ──────────────────────────────────────────────────────────────────
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = typeof tenants.$inferInsert;
@@ -552,3 +639,9 @@ export type AuditLog = typeof auditLogs.$inferSelect;
 export type ConsentRecord = typeof consentRecords.$inferSelect;
 export type BackgroundCheck = typeof backgroundChecks.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = typeof projects.$inferInsert;
+export type ProjectContribution = typeof projectContributions.$inferSelect;
+export type InsertProjectContribution = typeof projectContributions.$inferInsert;
+export type ProjectUpdate = typeof projectUpdates.$inferSelect;
+export type InsertProjectUpdate = typeof projectUpdates.$inferInsert;

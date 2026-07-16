@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  FolderHeart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -24,6 +25,7 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { href: "/sponsor/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/sponsor/child", label: "My Child", icon: Heart },
+  { href: "/sponsor/projects", label: "My Projects", icon: FolderHeart },
   { href: "/sponsor/messages", label: "Messages", icon: MessageCircle },
   { href: "/sponsor/payments", label: "Payments", icon: CreditCard },
   { href: "/sponsor/profile", label: "My Profile", icon: User },

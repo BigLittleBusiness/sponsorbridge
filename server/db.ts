@@ -6,6 +6,9 @@ import {
   children,
   childUpdates,
   consentRecords,
+  projectContributions,
+  projects,
+  projectUpdates,
   InsertUser,
   messages,
   notifications,
@@ -687,4 +690,156 @@ export async function deleteChildUpdate(id: number, tenantId: number) {
   const db = await getDb();
   if (!db) return;
   await db.delete(childUpdates).where(and(eq(childUpdates.id, id), eq(childUpdates.tenantId, tenantId)));
+}
+
+// ─── PROJECTS ─────────────────────────────────────────────────────────────────
+
+export async function getProjects(tenantId: number, filters?: {
+  status?: string;
+  category?: string;
+  isPublic?: boolean;
+  search?: string;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  const conditions: ReturnType<typeof eq>[] = [eq(projects.tenantId, tenantId) as any];
+  if (filters?.status) conditions.push(eq(projects.status, filters.status as any) as any);
+  if (filters?.category) conditions.push(eq(projects.category, filters.category as any) as any);
+  if (filters?.isPublic !== undefined) conditions.push(eq(projects.isPublic, filters.isPublic) as any);
+  if (filters?.search) conditions.push(like(projects.title, `%${filters.search}%`) as any);
+  return db.select().from(projects).where(and(...conditions)).orderBy(desc(projects.createdAt));
+}
+
+export async function getProjectById(id: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(projects)
+    .where(and(eq(projects.id, id), eq(projects.tenantId, tenantId))).limit(1);
+  return result[0];
+}
+
+export async function getProjectBySlug(slug: string, tenantId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(projects)
+    .where(and(eq(projects.slug, slug), eq(projects.tenantId, tenantId))).limit(1);
+  return result[0];
+}
+
+export async function createProject(data: typeof projects.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("DB not available");
+  const result = await db.insert(projects).values(data);
+  return result;
+}
+
+export async function updateProject(id: number, tenantId: number, data: Partial<typeof projects.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(projects).set({ ...data, updatedAt: new Date() })
+    .where(and(eq(projects.id, id), eq(projects.tenantId, tenantId)));
+}
+
+export async function incrementProjectRaised(projectId: number, amountCents: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(projects)
+    .set({ raisedAmountCents: sql<number>`raisedAmountCents + ${amountCents}`, updatedAt: new Date() })
+    .where(eq(projects.id, projectId));
+}
+
+// ─── PROJECT CONTRIBUTIONS ────────────────────────────────────────────────────
+
+export async function getProjectContributions(projectId: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(projectContributions)
+    .where(and(eq(projectContributions.projectId, projectId), eq(projectContributions.tenantId, tenantId)))
+    .orderBy(desc(projectContributions.createdAt));
+}
+
+export async function getContributionsByProject(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(projectContributions)
+    .where(and(eq(projectContributions.projectId, projectId), eq(projectContributions.status, "succeeded")))
+    .orderBy(desc(projectContributions.paidAt));
+}
+
+export async function createProjectContribution(data: typeof projectContributions.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("DB not available");
+  const result = await db.insert(projectContributions).values(data);
+  return result;
+}
+
+export async function updateProjectContribution(id: number, data: Partial<typeof projectContributions.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(projectContributions).set({ ...data, updatedAt: new Date() })
+    .where(eq(projectContributions.id, id));
+}
+
+export async function getContributionByStripePaymentIntent(paymentIntentId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(projectContributions)
+    .where(eq(projectContributions.stripePaymentIntentId, paymentIntentId)).limit(1);
+  return result[0];
+}
+
+export async function getContributionByStripeSubscription(subscriptionId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(projectContributions)
+    .where(eq(projectContributions.stripeSubscriptionId, subscriptionId)).limit(1);
+  return result[0];
+}
+
+export async function getSponsorProjectContributions(sponsorId: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: projectContributions.id,
+    amountCents: projectContributions.amountCents,
+    currency: projectContributions.currency,
+    isRecurring: projectContributions.isRecurring,
+    status: projectContributions.status,
+    paidAt: projectContributions.paidAt,
+    createdAt: projectContributions.createdAt,
+    projectId: projectContributions.projectId,
+    projectTitle: projects.title,
+    projectSlug: projects.slug,
+    projectCategory: projects.category,
+    projectStatus: projects.status,
+  }).from(projectContributions)
+    .innerJoin(projects, eq(projectContributions.projectId, projects.id))
+    .where(and(
+      eq(projectContributions.sponsorId, sponsorId),
+      eq(projectContributions.tenantId, tenantId),
+      eq(projectContributions.status, "succeeded"),
+    ))
+    .orderBy(desc(projectContributions.paidAt));
+}
+
+// ─── PROJECT UPDATES ──────────────────────────────────────────────────────────
+
+export async function getProjectUpdates(projectId: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(projectUpdates)
+    .where(and(eq(projectUpdates.projectId, projectId), eq(projectUpdates.tenantId, tenantId)))
+    .orderBy(desc(projectUpdates.createdAt));
+}
+
+export async function createProjectUpdate(data: typeof projectUpdates.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("DB not available");
+  return db.insert(projectUpdates).values(data);
+}
+
+export async function deleteProjectUpdate(id: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(projectUpdates).where(and(eq(projectUpdates.id, id), eq(projectUpdates.tenantId, tenantId)));
 }

@@ -79,6 +79,15 @@ import SponsorMessagesPage from "./pages/sponsor/SponsorMessagesPage";
 import SponsorPaymentsPage from "./pages/sponsor/SponsorPaymentsPage";
 import SponsorProfilePage from "./pages/sponsor/SponsorProfilePage";
 
+// Projects
+import ProjectsList from "./pages/projects/ProjectsList";
+import ProjectForm from "./pages/projects/ProjectForm";
+import ProjectDetail from "./pages/projects/ProjectDetail";
+import FundraisingPage from "./pages/projects/FundraisingPage";
+
+// Sponsor portal - Projects
+import SponsorProjectsPage from "./pages/sponsor/SponsorProjectsPage";
+
 // System Admin
 import SystemAdminDashboard from "./pages/admin/SystemAdminDashboard";
 
@@ -160,6 +169,25 @@ function Router() {
       {/* Community & Ambassador */}
       <Route path="/community" component={CommunityPage} />
 
+      {/* Projects (staff) */}
+      <Route path="/projects" component={ProjectsList} />
+      <Route path="/projects/new" component={() => <ProjectForm />} />
+      <Route path="/projects/:id/edit" component={({ params }: { params: { id: string } }) => <ProjectForm projectId={parseInt(params.id)} />} />
+      <Route path="/projects/:id" component={({ params }: { params: { id: string } }) => <ProjectDetail projectId={parseInt(params.id)} />} />
+
+      {/* Public fundraising pages */}
+      <Route path="/fund/:slug" component={({ params }: { params: { slug: string } }) => <FundraisingPage slug={params.slug} />} />
+      <Route path="/fund/:slug/thank-you" component={({ params }: { params: { slug: string } }) => (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50/50 to-background">
+          <div className="text-center space-y-4 p-8">
+            <div className="text-5xl">🎉</div>
+            <h1 className="text-3xl font-bold">Thank you for your generosity!</h1>
+            <p className="text-muted-foreground">Your contribution is being processed. A receipt will be emailed to you shortly.</p>
+            <a href={`/fund/${params.slug}`} className="inline-block mt-4 text-primary underline">Return to campaign</a>
+          </div>
+        </div>
+      )} />
+
       {/* Sponsor portal */}
       <Route path="/sponsor/login" component={SponsorLoginPage} />
       <Route path="/sponsor/dashboard" component={SponsorDashboard} />
@@ -167,6 +195,7 @@ function Router() {
       <Route path="/sponsor/messages" component={SponsorMessagesPage} />
       <Route path="/sponsor/payments" component={SponsorPaymentsPage} />
       <Route path="/sponsor/profile" component={SponsorProfilePage} />
+      <Route path="/sponsor/projects" component={SponsorProjectsPage} />
 
       {/* System Admin */}
       <Route path="/admin" component={SystemAdminDashboard} />

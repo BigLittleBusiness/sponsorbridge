@@ -287,3 +287,22 @@
 - [x] Frontend: Post Update form inline on ChildDetail.tsx (title, category, content, media URL, publish toggle)
 - [x] Frontend: Existing updates list with type icons, date, delete action
 - [x] TypeScript clean, all 27 tests passing
+
+## Phase 32: Project Sponsorship Feature
+
+- [x] DB schema: projects, project_contributions, project_updates tables migrated
+- [x] Backend: DB helpers (createProject, updateProject, getProjectsByTenant, getProjectBySlug, createContribution, updateContribution, getContributionsByProject, createProjectUpdate, getProjectUpdates, deleteProjectUpdate)
+- [x] tRPC procedures: projects.list, projects.getById, projects.getBySlug, projects.create, projects.update, projects.postUpdate, projects.getUpdates, projects.deleteUpdate, projects.getContributions, projects.getDonorWall, projects.createCheckout, projects.myContributions
+- [x] Stripe checkout session creation for one-off and recurring contributions
+- [x] Stripe webhook handler for checkout.session.completed and invoice.paid (recurring)
+- [x] SES email triggers: contribution receipt, project update notification to contributors
+- [x] Staff UI: ProjectsList page with summary cards, search/filter, project cards with progress bars
+- [x] Staff UI: ProjectForm (New/Edit) with full campaign details and settings
+- [x] Staff UI: ProjectDetail with contributions table, Post Update form, updates feed
+- [x] Public fundraising page: /fund/:slug with progress bar, donor wall, updates, Give Once/Monthly widget
+- [x] Thank-you page: /fund/:slug/thank-you
+- [x] Sponsor portal: SponsorProjectsPage (My Projects tab) with contribution history
+- [x] SponsorPortalLayout: added "My Projects" nav item with FolderHeart icon
+- [x] SponsorBridgeLayout: added "Projects" nav item for staff
+- [x] All routes registered in App.tsx
+- [x] TypeScript clean, all 27 tests passing

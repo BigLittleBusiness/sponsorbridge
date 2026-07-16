@@ -10,6 +10,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { onboardingHeartbeatHandler } from "../scheduled/onboarding";
 import { registerStripeRoutes } from "../stripe";
+import { handleProjectStripeWebhook } from "../routers/projects";
 import { customAuthRouter } from "../customAuth";
 import { sponsorAuthRouter } from "../sponsorAuth";
 import cookieParser from "cookie-parser";
@@ -39,6 +40,18 @@ async function startServer() {
 
   // Stripe webhook MUST be registered before express.json() so it receives raw body for signature verification
   registerStripeRoutes(app);
+
+  // Project sponsorship Stripe webhook (raw body required for signature verification)
+  app.post("/api/projects/webhook", express.raw({ type: "application/json" }), async (req, res) => {
+    const sig = req.headers["stripe-signature"] as string;
+    try {
+      const result = await handleProjectStripeWebhook(req.body as Buffer, sig);
+      res.json(result);
+    } catch (err: any) {
+      console.error("[ProjectWebhook] Error:", err.message);
+      res.status(400).json({ error: err.message });
+    }
+  });
 
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
