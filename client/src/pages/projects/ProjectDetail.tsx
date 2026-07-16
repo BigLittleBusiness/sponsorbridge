@@ -17,6 +17,7 @@ import {
   ArrowLeft, Edit, ExternalLink, Users, DollarSign, TrendingUp,
   Plus, Trash2, Loader2, Send, Bell, FileText, Calendar
 } from "lucide-react";
+import ImageUploadWidget from "@/components/ImageUploadWidget";
 
 interface ProjectDetailProps {
   projectId: number;
@@ -51,6 +52,8 @@ export default function ProjectDetail({ projectId }: ProjectDetailProps) {
     isPublished: true,
     notifyContributors: true,
   });
+
+  const uploadImageMutation = trpc.projects.uploadUpdateImage.useMutation();
   const [showUpdateForm, setShowUpdateForm] = useState(false);
 
   const { data: project, isLoading } = trpc.projects.getById.useQuery(
@@ -303,15 +306,12 @@ export default function ProjectDetail({ projectId }: ProjectDetailProps) {
                   onChange={(e) => setUpdateForm((f) => ({ ...f, content: e.target.value }))}
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Media URL (optional)</Label>
-                <Input
-                  type="url"
-                  placeholder="https://..."
-                  value={updateForm.mediaUrl}
-                  onChange={(e) => setUpdateForm((f) => ({ ...f, mediaUrl: e.target.value }))}
-                />
-              </div>
+              <ImageUploadWidget
+                uploadMutation={uploadImageMutation}
+                currentUrl={updateForm.mediaUrl}
+                onUploaded={(url) => setUpdateForm((f) => ({ ...f, mediaUrl: url }))}
+                onClear={() => setUpdateForm((f) => ({ ...f, mediaUrl: "" }))}
+              />
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Switch
@@ -376,9 +376,11 @@ export default function ProjectDetail({ projectId }: ProjectDetailProps) {
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-3">{u.content}</p>
                   {u.mediaUrl && (
-                    <a href={u.mediaUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline">
-                      View media
-                    </a>
+                    <img
+                      src={u.mediaUrl}
+                      alt="Update photo"
+                      className="mt-2 rounded-lg max-h-40 object-cover w-full"
+                    />
                   )}
                 </div>
               ))}

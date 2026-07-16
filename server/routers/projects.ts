@@ -1,6 +1,7 @@
 import { z } from "zod";
 import Stripe from "stripe";
 import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
+import { storagePut } from "../storage";
 import { TRPCError } from "@trpc/server";
 import {
   getProjects,
@@ -444,6 +445,22 @@ export const projectsRouter = router({
       if (!tenantId) return [];
       const { getSponsorProjectContributions } = await import("../db");
       return getSponsorProjectContributions(sponsor.id, tenantId);
+    }),
+
+  // ── Staff: upload an image for a project update ──
+  uploadUpdateImage: protectedProcedure
+    .input(z.object({
+      // base64-encoded image data
+      base64: z.string(),
+      mimeType: z.string().regex(/^image\//),
+      filename: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      requireRole(ctx.user.role, [...STAFF_ROLES]);
+      const buffer = Buffer.from(input.base64, "base64");
+      const key = `project-updates/${ctx.user.id}/${Date.now()}-${input.filename.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+      const { url } = await storagePut(key, buffer, input.mimeType);
+      return { url };
     }),
 });
 

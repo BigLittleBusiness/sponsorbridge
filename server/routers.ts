@@ -9,6 +9,7 @@ import { getDb } from "./db";
 import { referrals, events } from "../drizzle/schema";
 import { sysAdminRouter } from "./routers/sysAdmin";
 import { projectsRouter } from "./routers/projects";
+import { storagePut } from "./storage";
 import {
   acknowledgePolicy,
   appendAuditLog,
@@ -60,6 +61,8 @@ import {
   createChildUpdate,
   getChildUpdates,
   deleteChildUpdate,
+  getSponsorPortalAccount,
+  upsertSponsorPortalAccount,
 } from "./db";
 import { TRPCError } from "@trpc/server";
 
@@ -300,6 +303,19 @@ export const appRouter = router({
         });
         return { success: true };
       }),
+    uploadUpdateImage: protectedProcedure
+      .input(z.object({
+        base64: z.string(),
+        mimeType: z.string().regex(/^image\//),
+        filename: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, [...STAFF_ROLES]);
+        const buffer = Buffer.from(input.base64, "base64");
+        const key = `child-updates/${ctx.user.id}/${Date.now()}-${input.filename.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+        const { url } = await storagePut(key, buffer, input.mimeType);
+        return { url };
+      }),
   }),
 
   // ─── SPONSORS ──────────────────────────────────────────────────────────────
@@ -360,6 +376,31 @@ export const appRouter = router({
         await updateSponsor(id, tenantId, data);
         await appendAuditLog({ userId: ctx.user.id, tenantId, action: "SPONSOR_UPDATED", entityType: "sponsor", entityId: String(id), afterValue: data });
         return { success: true };
+      }),
+    getPortalAccount: protectedProcedure
+      .input(z.object({ sponsorId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, [...MANAGER_ROLES, "sponsor_relations"]);
+        return getSponsorPortalAccount(input.sponsorId);
+      }),
+    createPortalAccount: protectedProcedure
+      .input(z.object({
+        sponsorId: z.number(),
+        tenantId: z.number(),
+        email: z.string().email(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        requireRole(ctx.user.role, [...MANAGER_ROLES, "sponsor_relations"]);
+        const account = await upsertSponsorPortalAccount(input);
+        await appendAuditLog({
+          userId: ctx.user.id,
+          tenantId: input.tenantId,
+          action: "SPONSOR_PORTAL_ACCOUNT_CREATED",
+          entityType: "sponsor",
+          entityId: String(input.sponsorId),
+          afterValue: { email: input.email },
+        });
+        return { success: true, accountId: account.id };
       }),
   }),
 

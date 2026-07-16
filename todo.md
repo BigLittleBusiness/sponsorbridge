@@ -306,3 +306,10 @@
 - [x] SponsorBridgeLayout: added "Projects" nav item for staff
 - [x] All routes registered in App.tsx
 - [x] TypeScript clean, all 27 tests passing
+
+## Phase 33: UX Improvements
+
+- [x] Create Portal Account button on Sponsor detail page (backend: createSponsorPortalAccount procedure, frontend: button + dialog)
+- [x] S3 image upload widget in Project Update form (ProjectDetail.tsx) — replace media URL field
+- [x] S3 image upload widget in Child Update form (ChildDetail.tsx) — replace media URL field
+- [x] Social sharing buttons on public fundraising page (Twitter/X, Facebook, WhatsApp, copy link)

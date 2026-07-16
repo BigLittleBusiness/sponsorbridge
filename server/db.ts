@@ -16,6 +16,7 @@ import {
   policyAcknowledgments,
   safeguardingIncidents,
   sponsors,
+  sponsorPortalAccounts,
   sponsorships,
   surveys,
   tenants,
@@ -842,4 +843,37 @@ export async function deleteProjectUpdate(id: number, tenantId: number) {
   const db = await getDb();
   if (!db) return;
   await db.delete(projectUpdates).where(and(eq(projectUpdates.id, id), eq(projectUpdates.tenantId, tenantId)));
+}
+
+// ─── SPONSOR PORTAL ACCOUNTS ─────────────────────────────────────────────────
+
+export async function getSponsorPortalAccount(sponsorId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(sponsorPortalAccounts)
+    .where(eq(sponsorPortalAccounts.sponsorId, sponsorId)).limit(1);
+  return result[0];
+}
+
+export async function upsertSponsorPortalAccount(data: {
+  sponsorId: number;
+  tenantId: number;
+  email: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("DB not available");
+  // Upsert: if an account already exists for this sponsor, reactivate and update email.
+  const existing = await getSponsorPortalAccount(data.sponsorId);
+  if (existing) {
+    await db.update(sponsorPortalAccounts)
+      .set({ email: data.email, isActive: true, isVerified: false, otpCode: null, otpExpiresAt: null, updatedAt: new Date() })
+      .where(eq(sponsorPortalAccounts.id, existing.id));
+    return { ...existing, email: data.email, isActive: true, isVerified: false };
+  }
+  const result = await db.insert(sponsorPortalAccounts).values({
+    ...data,
+    isActive: true,
+    isVerified: false,
+  });
+  return { id: (result as any).insertId as number, ...data };
 }

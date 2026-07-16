@@ -30,6 +30,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
+import ImageUploadWidget from "@/components/ImageUploadWidget";
 
 const DEMO_TENANT_ID = 1;
 
@@ -111,6 +112,8 @@ export default function ChildDetail() {
     },
     onError: (err) => toast.error(err.message),
   });
+
+  const uploadImageMutation = trpc.children.uploadUpdateImage.useMutation();
 
   const age = child?.dateOfBirth
     ? Math.floor(
@@ -440,20 +443,13 @@ export default function ChildDetail() {
                       />
                     </div>
 
-                    {/* Optional media URL */}
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground block mb-1">
-                        Media URL{" "}
-                        <span className="text-muted-foreground/60 font-normal">(optional)</span>
-                      </label>
-                      <Input
-                        placeholder="https://… (photo, video, or document link)"
-                        value={form.mediaUrl}
-                        onChange={(e) => setForm((f) => ({ ...f, mediaUrl: e.target.value }))}
-                        type="url"
-                        className="text-sm"
-                      />
-                    </div>
+                    {/* S3 image upload */}
+                    <ImageUploadWidget
+                      uploadMutation={uploadImageMutation}
+                      currentUrl={form.mediaUrl}
+                      onUploaded={(url) => setForm((f) => ({ ...f, mediaUrl: url }))}
+                      onClear={() => setForm((f) => ({ ...f, mediaUrl: "" }))}
+                    />
 
                     {/* Publish toggle */}
                     <div className="flex items-center gap-2">
