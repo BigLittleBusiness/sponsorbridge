@@ -13,11 +13,36 @@ import {
   Zap,
   Globe,
   Baby,
+  FolderHeart,
+  Building2,
+  Droplets,
+  GraduationCap,
+  Monitor,
+  Plane,
+  Share2,
+  TrendingUp,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useCustomAuth } from "@/contexts/CustomAuthContext";
 
 const FEATURES = [
+  {
+    icon: Baby,
+    title: "Child Sponsorship Management",
+    description:
+      "Comprehensive child profiles with photo uploads, education and health tracking, consent management, and a clear AVAILABLE → SPONSORED → GRADUATED workflow.",
+    color: "text-terracotta",
+    bg: "bg-red-50",
+  },
+  {
+    icon: FolderHeart,
+    title: "Project & Campaign Sponsorship",
+    description:
+      "Launch fundraising campaigns for houses, wells, computers, teachers, and events. Set goals, track contributions in real time, and publish updates to every donor automatically.",
+    color: "text-amber-600",
+    bg: "bg-amber-50",
+    isNew: true,
+  },
   {
     icon: Users,
     title: "Multi-Tenant Architecture",
@@ -25,14 +50,6 @@ const FEATURES = [
       "Each charity operates in a fully isolated environment with white-label branding, custom domains, and subdomain routing.",
     color: "text-trust-blue",
     bg: "bg-blue-50",
-  },
-  {
-    icon: Baby,
-    title: "Child Profile Management",
-    description:
-      "Comprehensive profiles with photo uploads, education and health tracking, consent management, and a clear AVAILABLE → SPONSORED → GRADUATED workflow.",
-    color: "text-terracotta",
-    bg: "bg-red-50",
   },
   {
     icon: Zap,
@@ -85,23 +102,60 @@ const FEATURES = [
 ];
 
 const STATS = [
+  { value: "2", label: "Sponsorship Models" },
   { value: "7", label: "Defined Staff Roles" },
   { value: "90", label: "Day Onboarding Sequence" },
-  { value: "100%", label: "Moderated Communications" },
   { value: "GDPR", label: "& COPPA Compliant" },
 ];
 
-// Research-accurate comparison:
-// Large orgs (World Vision, Compassion, Plan International) genuinely have:
-//   child selector/browse, sponsor app, auto-translated correspondence, trust badges, community impact stats
-// Large orgs do NOT have (confirmed by research):
-//   moderated vlogs, NPS/CSAT surveys, RBAC with defined roles, incident management, immutable audit trail,
-//   white-label multi-tenancy, churn prediction, or 90-day structured onboarding sequences
-const COMPARISON: { feature: string; large: boolean; small: boolean; note?: string }[] = [
+const CAMPAIGN_TYPES = [
+  {
+    icon: Building2,
+    label: "Infrastructure",
+    example: "Build a house",
+    color: "bg-orange-100 text-orange-700",
+  },
+  {
+    icon: Droplets,
+    label: "Clean Water",
+    example: "Drill a well",
+    color: "bg-blue-100 text-blue-700",
+  },
+  {
+    icon: GraduationCap,
+    label: "Education",
+    example: "Sponsor a teacher",
+    color: "bg-green-100 text-green-700",
+  },
+  {
+    icon: Monitor,
+    label: "Equipment",
+    example: "Computers for a school",
+    color: "bg-purple-100 text-purple-700",
+  },
+  {
+    icon: Plane,
+    label: "Events & Trips",
+    example: "Fund a field trip",
+    color: "bg-pink-100 text-pink-700",
+  },
+  {
+    icon: FolderHeart,
+    label: "Emergency Relief",
+    example: "Disaster response fund",
+    color: "bg-red-100 text-red-700",
+  },
+];
+
+// Research-accurate comparison — updated to include project sponsorship
+const COMPARISON: { feature: string; large: boolean; small: boolean; note?: string; isNew?: boolean }[] = [
   { feature: "Child profile browse & selector", large: true, small: false },
   { feature: "Sponsor app with giving history", large: true, small: false },
   { feature: "Auto-translated correspondence", large: true, small: false },
   { feature: "Community impact statistics", large: true, small: false },
+  { feature: "Project & item campaign sponsorship", large: false, small: false, isNew: true },
+  { feature: "Public fundraising pages with social sharing", large: false, small: false, isNew: true },
+  { feature: "Recurring monthly project contributions", large: false, small: false, isNew: true },
   { feature: "Structured 90-day onboarding sequence", large: false, small: false, note: "Built in-house at enormous cost" },
   { feature: "Moderated vlog system", large: false, small: false },
   { feature: "Role-based access control (7 roles)", large: false, small: false },
@@ -183,7 +237,7 @@ export default function Home() {
               The platform that empowers child sponsorship charities.
             </h1>
             <p className="text-xl text-white/70 mb-8 leading-relaxed">
-              SponsorBridge gives smaller charities the same sophisticated tools that the world's largest child sponsorship organisations use — at a fraction of the cost. Multi-tenant, white-label, and built with child protection at its core.
+              SponsorBridge gives smaller charities the same sophisticated tools that the world's largest child sponsorship organisations use — at a fraction of the cost. Now with full project and campaign sponsorship so your donors can fund houses, wells, teachers, and more.
             </p>
             <div className="flex flex-wrap gap-4">
               {account ? (
@@ -261,6 +315,86 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── NEW: Project Sponsorship Feature Section ── */}
+      <section className="py-20 bg-gradient-to-br from-amber-50 to-orange-50 border-y border-amber-100">
+        <div className="container">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: copy */}
+            <div>
+              <Badge className="mb-4 bg-amber-600/10 text-amber-700 border-amber-300 text-sm">
+                New — Project &amp; Campaign Sponsorship
+              </Badge>
+              <h2 className="text-4xl font-bold font-serif text-[#1a2e1a] mb-5 leading-tight">
+                Beyond child sponsorship.<br />
+                <span className="text-amber-600">Fund the community around them.</span>
+              </h2>
+              <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+                Now your donors can sponsor the infrastructure, education, and events that transform entire communities — not just individual children. Every campaign gets a public fundraising page, a live progress bar, and automatic donor updates when you post news.
+              </p>
+              <div className="space-y-3 mb-8">
+                {[
+                  { icon: TrendingUp, text: "Set a funding goal and track progress in real time" },
+                  { icon: Share2, text: "Shareable fundraising pages — donors spread the word on social media" },
+                  { icon: Zap, text: "One-off and monthly recurring contributions via Stripe" },
+                  { icon: MessageSquare, text: "Post project updates — every contributor is notified instantly" },
+                ].map(({ icon: Icon, text }) => (
+                  <div key={text} className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
+                      <Icon className="w-3.5 h-3.5 text-amber-700" />
+                    </div>
+                    <span className="text-sm text-foreground leading-relaxed">{text}</span>
+                  </div>
+                ))}
+              </div>
+              <Link href="/register">
+                <Button className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-8 gap-2">
+                  Launch your first campaign
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Right: campaign type grid */}
+            <div>
+              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4">
+                Campaign types your donors can fund
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {CAMPAIGN_TYPES.map((ct) => (
+                  <div
+                    key={ct.label}
+                    className="bg-white rounded-xl border border-border p-4 flex flex-col items-center text-center shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className={`w-10 h-10 rounded-lg ${ct.color} flex items-center justify-center mb-2`}>
+                      <ct.icon className="w-5 h-5" />
+                    </div>
+                    <div className="font-semibold text-sm text-[#1a2e1a]">{ct.label}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{ct.example}</div>
+                  </div>
+                ))}
+              </div>
+              {/* Mini fundraising card mockup */}
+              <div className="mt-4 bg-white rounded-xl border border-amber-200 p-4 shadow-sm">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <div className="text-sm font-semibold text-[#1a2e1a]">Clean Water Well — Kibera</div>
+                    <div className="text-xs text-muted-foreground">Infrastructure · 47 contributors</div>
+                  </div>
+                  <Badge className="bg-green-100 text-green-700 border-0 text-xs">Active</Badge>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-2 mb-1.5">
+                  <div className="bg-amber-500 h-2 rounded-full" style={{ width: "73%" }} />
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span className="font-medium text-amber-700">$7,300 raised</span>
+                  <span>of $10,000 goal</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section className="py-20">
         <div className="container">
@@ -269,13 +403,18 @@ export default function Home() {
               Everything a charity needs to grow
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              From child profiles to donor retention analytics — SponsorBridge covers the full
+              From child profiles to community project campaigns — SponsorBridge covers the full
               sponsorship lifecycle with child protection built in at every step.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {FEATURES.map((feature) => (
-              <Card key={feature.title} className="card-hover border-border">
+              <Card key={feature.title} className="card-hover border-border relative">
+                {feature.isNew && (
+                  <div className="absolute -top-2 -right-2">
+                    <Badge className="bg-amber-500 text-white border-0 text-xs px-2 py-0.5 shadow">New</Badge>
+                  </div>
+                )}
                 <CardContent className="pt-6">
                   <div
                     className={`w-10 h-10 rounded-lg ${feature.bg} flex items-center justify-center mb-4`}
@@ -317,8 +456,8 @@ export default function Home() {
               {
                 step: "02",
                 emoji: "👧",
-                title: "Add children and match sponsors",
-                description: "Upload child profiles with photos, education and health records. Our two-way matching engine connects sponsors with the right child based on preferences.",
+                title: "Add children, sponsors, and campaigns",
+                description: "Upload child profiles for individual sponsorship, or launch project campaigns for houses, wells, computers, and events. Both models work side by side.",
               },
               {
                 step: "03",
@@ -359,8 +498,8 @@ export default function Home() {
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               The world's largest child sponsorship organisations have invested millions in
-              proprietary technology. SponsorBridge makes those same capabilities accessible to
-              every organisation.
+              proprietary technology. SponsorBridge makes those same capabilities — plus new ones
+              they don't have — accessible to every organisation.
             </p>
           </div>
           <div className="max-w-3xl mx-auto overflow-x-auto">
@@ -384,10 +523,15 @@ export default function Home() {
                 {COMPARISON.map((row, i) => (
                   <tr
                     key={row.feature}
-                    className={`border-b border-border ${i % 2 === 0 ? "bg-warm-linen/30" : ""}`}
+                    className={`border-b border-border ${row.isNew ? "bg-amber-50/60" : i % 2 === 0 ? "bg-warm-linen/30" : ""}`}
                   >
                     <td className="py-3 px-4 text-foreground">
-                      <span>{row.feature}</span>
+                      <div className="flex items-center gap-2">
+                        <span>{row.feature}</span>
+                        {row.isNew && (
+                          <Badge className="bg-amber-500 text-white border-0 text-xs px-1.5 py-0 leading-5">New</Badge>
+                        )}
+                      </div>
                       {row.note && (
                         <span className="block text-xs text-muted-foreground mt-0.5 italic">{row.note}</span>
                       )}
@@ -436,10 +580,16 @@ export default function Home() {
                 Sponsors who feel connected stay for years, not months.
               </h2>
               <p className="text-white/70 leading-relaxed mb-6">
-                SponsorBridge's moderated vlog system, personalised impact reports, and 90-day onboarding sequence transform one-time donors into lifelong champions for the children they support.
+                SponsorBridge's moderated vlog system, personalised impact reports, and 90-day onboarding sequence transform one-time donors into lifelong champions — whether they're sponsoring a child or funding a community project.
               </p>
               <div className="space-y-2">
-                {["Monthly video updates from the field", "Personalised impact dashboards", "Secure two-way messaging", "Automated retention campaigns"].map((item) => (
+                {[
+                  "Monthly video updates from the field",
+                  "Personalised impact dashboards",
+                  "Secure two-way messaging",
+                  "Automated retention campaigns",
+                  "Project progress updates to all contributors",
+                ].map((item) => (
                   <div key={item} className="flex items-center gap-2 text-sm text-white/80">
                     <CheckCircle2 className="w-4 h-4 text-sage shrink-0" />
                     {item}
@@ -495,7 +645,7 @@ export default function Home() {
             <Badge className="mb-3 bg-sage/10 text-sage border-sage/30">See it in action</Badge>
             <h2 className="text-3xl font-bold font-serif mb-3">A platform built for the way charities actually work</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              From the dashboard to safeguarding reports, every screen is designed for clarity, speed, and child protection compliance.
+              From child profiles to project campaigns, safeguarding reports to donor analytics — every screen is designed for clarity, speed, and child protection compliance.
             </p>
           </div>
           <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border max-w-5xl mx-auto">
@@ -506,7 +656,7 @@ export default function Home() {
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/40 to-transparent p-6">
               <div className="flex flex-wrap gap-3 justify-center">
-                {["Child profiles", "Sponsor matching", "Vlog moderation", "Retention analytics", "Safeguarding"].map((tag) => (
+                {["Child profiles", "Project campaigns", "Sponsor matching", "Vlog moderation", "Retention analytics", "Safeguarding"].map((tag) => (
                   <Badge key={tag} className="bg-white/20 text-white border-white/30 backdrop-blur-sm">{tag}</Badge>
                 ))}
               </div>
@@ -522,20 +672,23 @@ export default function Home() {
             Simple, transparent pricing
           </h2>
           <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
-            Start free and scale as your programme grows. No hidden fees, no lock-in contracts.
+            Start free and scale as your programme grows. Project sponsorship is included on Growth plans and above.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-10">
             {[
-              { name: "Starter", price: "Free", note: "Up to 50 sponsors" },
-              { name: "Growth", price: "$99/mo", note: "Up to 500 sponsors" },
-              { name: "Scale", price: "$249/mo", note: "Up to 2,000 sponsors" },
-              { name: "Enterprise", price: "Custom", note: "Unlimited" },
+              { name: "Starter", price: "Free", note: "Up to 50 sponsors · Child sponsorship" },
+              { name: "Growth", price: "$99/mo", note: "Up to 500 sponsors · + Project campaigns", highlight: true },
+              { name: "Scale", price: "$249/mo", note: "Up to 2,000 sponsors · + Advanced features" },
+              { name: "Enterprise", price: "Custom", note: "Unlimited · Full feature set" },
             ].map((tier) => (
               <div
                 key={tier.name}
-                className="bg-white rounded-xl border border-border p-5 text-left"
+                className={`rounded-xl border p-5 text-left ${tier.highlight ? "bg-amber-50 border-amber-300 shadow-sm" : "bg-white border-border"}`}
               >
-                <div className="font-semibold text-foreground mb-1">{tier.name}</div>
+                <div className="font-semibold text-foreground mb-1 flex items-center gap-1.5">
+                  {tier.name}
+                  {tier.highlight && <Badge className="bg-amber-500 text-white border-0 text-xs px-1.5 py-0 leading-5">Projects</Badge>}
+                </div>
                 <div className="text-xl font-bold text-terracotta mb-1">{tier.price}</div>
                 <div className="text-xs text-muted-foreground">{tier.note}</div>
               </div>
@@ -559,8 +712,8 @@ export default function Home() {
         <div className="container text-center">
           <h2 className="text-3xl font-bold font-serif mb-4">Ready to bridge the gap?</h2>
           <p className="text-white/70 text-lg mb-8 max-w-xl mx-auto">
-            Give your charity the tools it needs to acquire more sponsors, retain them longer, and
-            protect every child in your programme.
+            Give your charity the tools it needs to acquire more sponsors, retain them longer,
+            fund community projects, and protect every child in your programme.
           </p>
           {account ? (
             <Link href="/org-dashboard">

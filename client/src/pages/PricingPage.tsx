@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Check, X, ArrowRight, Users, Baby, Video, Shield,
-  Globe, BookOpen, Zap, Building2, HelpCircle
+  Globe, BookOpen, Zap, Building2, HelpCircle, FolderHeart,
+  Share2, TrendingUp
 } from "lucide-react";
 import { useCustomAuth } from "@/contexts/CustomAuthContext";
 
@@ -24,6 +25,7 @@ const TIERS = [
     features: [
       { text: "Up to 50 sponsors", icon: Users },
       { text: "Up to 100 children", icon: Baby },
+      { text: "Child sponsorship management", icon: Baby },
       { text: "Vlogs (add-on available)", icon: Video, addOn: true },
       { text: "Basic white-label branding", icon: Building2 },
       { text: "RBAC — 7 staff roles", icon: Shield },
@@ -34,6 +36,8 @@ const TIERS = [
       { text: "Community support", icon: HelpCircle },
     ],
     notIncluded: [
+      "Project & campaign sponsorship",
+      "Public fundraising pages",
       "Advanced safeguarding (add-on)",
       "DeepL auto-translation (add-on)",
       "Custom domain",
@@ -45,7 +49,7 @@ const TIERS = [
     name: "Growth",
     price: "$99",
     priceNote: "per month, billed monthly",
-    description: "For growing organisations ready to scale their sponsorship programme.",
+    description: "For growing organisations ready to scale their sponsorship programme — including project and campaign fundraising.",
     color: "border-terracotta",
     badge: "Most popular",
     cta: "Start free trial",
@@ -53,6 +57,10 @@ const TIERS = [
     features: [
       { text: "Up to 500 sponsors", icon: Users },
       { text: "Up to 1,000 children", icon: Baby },
+      { text: "Child sponsorship management", icon: Baby },
+      { text: "Project & campaign sponsorship", icon: FolderHeart, isNew: true },
+      { text: "Public fundraising pages + social sharing", icon: Share2, isNew: true },
+      { text: "One-off & monthly project contributions", icon: TrendingUp, isNew: true },
       { text: "Vlog system included", icon: Video },
       { text: "Full branding customisation", icon: Building2 },
       { text: "All core safeguarding features", icon: Shield },
@@ -75,7 +83,7 @@ const TIERS = [
     name: "Scale",
     price: "$249",
     priceNote: "per month, billed monthly",
-    description: "For established organisations managing large-scale sponsorship programmes.",
+    description: "For established organisations managing large-scale child and project sponsorship programmes.",
     color: "border-border",
     badge: null,
     cta: "Start free trial",
@@ -83,6 +91,10 @@ const TIERS = [
     features: [
       { text: "Up to 2,000 sponsors", icon: Users },
       { text: "Up to 5,000 children", icon: Baby },
+      { text: "Child sponsorship management", icon: Baby },
+      { text: "Project & campaign sponsorship", icon: FolderHeart, isNew: true },
+      { text: "Public fundraising pages + social sharing", icon: Share2, isNew: true },
+      { text: "One-off & monthly project contributions", icon: TrendingUp, isNew: true },
       { text: "Vlog system included", icon: Video },
       { text: "Full branding customisation", icon: Building2 },
       { text: "Advanced safeguarding", icon: Shield },
@@ -113,6 +125,9 @@ const TIERS = [
     features: [
       { text: "Unlimited sponsors", icon: Users },
       { text: "Unlimited children", icon: Baby },
+      { text: "Child sponsorship management", icon: Baby },
+      { text: "Project & campaign sponsorship", icon: FolderHeart, isNew: true },
+      { text: "Public fundraising pages + social sharing", icon: Share2, isNew: true },
       { text: "Vlog system included", icon: Video },
       { text: "Full branding + custom domain", icon: Building2 },
       { text: "Everything in Scale", icon: Shield },
@@ -134,6 +149,7 @@ const ADD_ONS = [
     price: "+$20/month",
     description: "Add field worker video uploads with charity moderation queue and safeguarding escalation.",
     icon: Video,
+    isNew: false,
   },
   {
     name: "DeepL Auto-Translation",
@@ -141,6 +157,7 @@ const ADD_ONS = [
     price: "+$15/month",
     description: "Automatically translate all sponsor–child messages using DeepL's neural translation engine.",
     icon: Globe,
+    isNew: false,
   },
   {
     name: "Advanced Safeguarding",
@@ -148,6 +165,7 @@ const ADD_ONS = [
     price: "+$30/month",
     description: "Upgrade to full incident management, case workflows, and staff vetting — without moving to Scale.",
     icon: Shield,
+    isNew: false,
   },
   {
     name: "Bookkeeping Integration Setup",
@@ -155,6 +173,7 @@ const ADD_ONS = [
     price: "One-time fee",
     description: "Professional setup of your Xero or QuickBooks integration, including chart of accounts mapping.",
     icon: BookOpen,
+    isNew: false,
   },
 ];
 
@@ -226,8 +245,11 @@ export default function PricingPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-[#1a2e1a] leading-tight mb-4">
             Simple pricing for every organisation
           </h1>
-          <p className="text-lg text-muted-foreground mb-8">
+          <p className="text-lg text-muted-foreground mb-2">
             Start free and scale as your programme grows. No hidden fees, no lock-in contracts.
+          </p>
+          <p className="text-sm text-amber-700 font-medium mb-8">
+            Project &amp; campaign sponsorship is now included on Growth plans and above.
           </p>
 
           {/* Annual toggle */}
@@ -293,11 +315,14 @@ export default function PricingPage() {
               <div className="space-y-2.5 flex-1">
                 {tier.features.map((f) => (
                   <div key={f.text} className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+                    <Check className={`w-4 h-4 shrink-0 mt-0.5 ${('isNew' in f) && f.isNew ? "text-amber-500" : "text-green-600"}`} />
                     <span className="text-sm text-foreground leading-snug">
                       {f.text}
                       {('addOn' in f) && f.addOn && (
                         <span className="ml-1 text-xs text-muted-foreground">(add-on)</span>
+                      )}
+                      {('isNew' in f) && f.isNew && (
+                        <Badge className="ml-1.5 bg-amber-500 text-white border-0 text-xs px-1.5 py-0 leading-5 align-middle">New</Badge>
                       )}
                     </span>
                   </div>
@@ -311,6 +336,38 @@ export default function PricingPage() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Project Sponsorship callout banner */}
+      <section className="pb-16 px-6">
+        <div className="max-w-5xl mx-auto bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div className="w-14 h-14 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <FolderHeart className="w-7 h-7 text-amber-700" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-lg font-bold text-[#1a2e1a]">Project &amp; Campaign Sponsorship — now included</h3>
+                <Badge className="bg-amber-500 text-white border-0 text-xs">New</Badge>
+              </div>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-3">
+                Growth plans and above now include the ability to create public fundraising campaigns for houses, wells, computers, teachers, events, and more. Each campaign gets a shareable fundraising page with a live progress bar, social sharing buttons, and automatic donor updates when you post news from the field.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {["Houses & infrastructure", "Clean water wells", "School equipment", "Teacher salaries", "Field trips & events", "Emergency relief"].map((tag) => (
+                  <span key={tag} className="text-xs bg-white border border-amber-200 text-amber-800 rounded-full px-2.5 py-1 font-medium">{tag}</span>
+                ))}
+              </div>
+            </div>
+            <div className="shrink-0">
+              <Link href="/register">
+                <Button className="bg-amber-600 hover:bg-amber-700 text-white whitespace-nowrap">
+                  Start free trial <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -356,6 +413,14 @@ export default function PricingPage() {
                 a: "All paid plans include a 14-day free trial. No credit card is required to start. You'll only be charged if you choose to continue after the trial.",
               },
               {
+                q: "Which plans include project and campaign sponsorship?",
+                a: "Project and campaign sponsorship — including public fundraising pages, social sharing, and recurring contributions — is available on Growth, Scale, and Enterprise plans. Starter plan users can upgrade at any time to unlock this feature.",
+              },
+              {
+                q: "Can donors give one-off and recurring contributions to projects?",
+                a: "Yes. Every project campaign supports both one-off donations and monthly recurring contributions via Stripe. Donors choose their preference at checkout, and you can see both types in your contributions dashboard.",
+              },
+              {
                 q: "What payment methods do you accept?",
                 a: "We accept all major credit and debit cards via Stripe. Enterprise customers can arrange invoice-based billing.",
               },
@@ -386,7 +451,7 @@ export default function PricingPage() {
         <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to bridge the gap?</h2>
           <p className="text-white/70 mb-8">
-            Join organisations already using SponsorBridge to connect sponsors with children and transform lives.
+            Join organisations already using SponsorBridge to connect sponsors with children, fund community projects, and transform lives.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/register">
