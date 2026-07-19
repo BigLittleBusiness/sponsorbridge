@@ -621,6 +621,14 @@ export const projectUpdates = mysqlTable("project_updates", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+// ─── EARLY ACCESS SIGNUPS ───────────────────────────────────────────────────
+export const earlyAccessSignups = mysqlTable("early_access_signups", {
+  id: int("id").autoincrement().primaryKey(),
+  firstName: varchar("firstName", { length: 100 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 // ─── EXPORTS ──────────────────────────────────────────────────────────────────
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = typeof tenants.$inferInsert;
@@ -645,3 +653,4 @@ export type ProjectContribution = typeof projectContributions.$inferSelect;
 export type InsertProjectContribution = typeof projectContributions.$inferInsert;
 export type ProjectUpdate = typeof projectUpdates.$inferSelect;
 export type InsertProjectUpdate = typeof projectUpdates.$inferInsert;
+export type EarlyAccessSignup = typeof earlyAccessSignups.$inferSelect;

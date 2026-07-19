@@ -63,6 +63,8 @@ import {
   deleteChildUpdate,
   getSponsorPortalAccount,
   upsertSponsorPortalAccount,
+  createEarlyAccessSignup,
+  getEarlyAccessSignups,
 } from "./db";
 import { TRPCError } from "@trpc/server";
 
@@ -940,5 +942,27 @@ export const appRouter = router({
 
   sysAdmin: sysAdminRouter,
   projects: projectsRouter,
+  earlyAccess: router({
+    signup: publicProcedure
+      .input(z.object({
+        firstName: z.string().min(1).max(100),
+        email: z.string().email(),
+      }))
+      .mutation(async ({ input }) => {
+        const result = await createEarlyAccessSignup(input);
+        if (result.alreadyRegistered) {
+          // Treat duplicate as success to avoid email enumeration
+          return { success: true };
+        }
+        return { success: true };
+      }),
+    list: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return getEarlyAccessSignups();
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

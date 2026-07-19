@@ -22,6 +22,7 @@ import {
   tenants,
   users,
   vlogs,
+  earlyAccessSignups,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -876,4 +877,31 @@ export async function upsertSponsorPortalAccount(data: {
     isVerified: false,
   });
   return { id: (result as any).insertId as number, ...data };
+}
+
+// ─── EARLY ACCESS SIGNUPS ─────────────────────────────────────────────────────
+
+export async function createEarlyAccessSignup(data: { firstName: string; email: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("DB not available");
+  // Check for duplicate email first to return a clean error
+  const existing = await db
+    .select()
+    .from(earlyAccessSignups)
+    .where(eq(earlyAccessSignups.email, data.email.toLowerCase().trim()))
+    .limit(1);
+  if (existing.length > 0) {
+    return { alreadyRegistered: true };
+  }
+  await db.insert(earlyAccessSignups).values({
+    firstName: data.firstName.trim(),
+    email: data.email.toLowerCase().trim(),
+  });
+  return { alreadyRegistered: false };
+}
+
+export async function getEarlyAccessSignups() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(earlyAccessSignups).orderBy(desc(earlyAccessSignups.createdAt));
 }

@@ -313,3 +313,10 @@
 - [x] S3 image upload widget in Project Update form (ProjectDetail.tsx) — replace media URL field
 - [x] S3 image upload widget in Child Update form (ChildDetail.tsx) — replace media URL field
 - [x] Social sharing buttons on public fundraising page (Twitter/X, Facebook, WhatsApp, copy link)
+
+## Phase 34: Early Access Signup Section
+- [x] DB migration: early_access_signups table (firstName, email, createdAt, unique email constraint)
+- [x] Backend: createEarlyAccessSignup and getEarlyAccessSignups helpers in db.ts
+- [x] Backend: earlyAccess.signup publicProcedure and earlyAccess.list adminProcedure in routers.ts
+- [x] Frontend: EarlyAccessSection component (form, validation, success/error states, responsive)
+- [x] Home.tsx: EarlyAccessSection inserted directly below hero section, above hero image strip

@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { useCustomAuth } from "@/contexts/CustomAuthContext";
+import { EarlyAccessSection } from "@/components/EarlyAccessSection";
 
 const FEATURES = [
   {
@@ -279,6 +280,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Early Access Signup Band */}
+      <EarlyAccessSection />
 
       {/* Hero image strip */}
       <section className="relative overflow-hidden bg-[#1a2e1a]" style={{ height: 420 }}>
