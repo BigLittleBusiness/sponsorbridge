@@ -28,9 +28,9 @@ import { toast } from "sonner";
 const NAV_ITEMS = [
   { href: "/org-dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/children", icon: Baby, label: "Children" },
-  { href: "/users", icon: Users, label: "Sponsors" },
+  { href: "/sponsors", icon: Users, label: "Sponsors" },
   { href: "/messages", icon: MessageSquare, label: "Communications" },
-  { href: "/analytics", icon: BarChart3, label: "Reports" },
+  { href: "/reports", icon: BarChart3, label: "Reports" },
   { href: "/payments", icon: DollarSign, label: "Donations" },
   { href: "/events", icon: Calendar, label: "Events" },
   { href: "/settings/tenant", icon: Settings, label: "Settings" },
@@ -42,7 +42,7 @@ function Sidebar({ account, onLogout }: { account: any; onLogout: () => void }) 
     <aside className="w-64 min-h-screen flex flex-col" style={{ backgroundColor: "#1a3a2e" }}>
       <div className="p-6 border-b border-white/10">
         <Link href="/org-dashboard">
-          <img src="/manus-storage/sb-header-dark.svg" alt="SponsorBridge" className="h-8 w-auto" />
+          <img src="/manus-storage/sb-icon-mark_f15604c9.svg" alt="SponsorBridge" className="h-8 w-8" />
         </Link>
       </div>
       <nav className="flex-1 p-4 space-y-1">

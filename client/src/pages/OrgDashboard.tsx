@@ -59,7 +59,7 @@ const NAV_ITEMS = [
   { href: "/children", icon: Baby, label: "Children" },
   { href: "/sponsors", icon: Users, label: "Sponsors" },
   { href: "/messages", icon: MessageSquare, label: "Communications" },
-  { href: "/analytics", icon: BarChart3, label: "Reports" },
+  { href: "/reports", icon: BarChart3, label: "Reports" },
   { href: "/payments", icon: DollarSign, label: "Donations" },
   { href: "/events", icon: Calendar, label: "Events" },
   { href: "/settings/tenant", icon: Settings, label: "Settings" },
@@ -118,7 +118,7 @@ function Sidebar({ currentPath, account, onLogout }: {
         <Link href="/org-dashboard">
           <div className="flex items-center gap-2.5 cursor-pointer">
             <img
-              src="https://sponsorapp-k6ifqkyq.manus.space/manus-storage/sb-icon-mark_2e7e3e8d.svg"
+              src="/manus-storage/sb-icon-mark_f15604c9.svg"
               alt="SponsorBridge"
               className="h-8 w-8"
             />

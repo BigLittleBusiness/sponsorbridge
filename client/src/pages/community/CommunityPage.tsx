@@ -85,7 +85,7 @@ export default function CommunityPage() {
   });
 
   const referralCode = referralData?.code ?? "";
-  const referralLink = referralCode ? `https://sponsorbridge.manus.space/join?ref=${referralCode}` : "";
+  const referralLink = referralCode ? `${window.location.origin}/register?ref=${encodeURIComponent(referralCode)}` : "";
   const referralCount = statsData?.referralCount ?? 0;
   const currentTierName = statsData?.tier ?? "Advocate";
   const monthlyImpact = statsData?.monthlyImpact ?? 0;

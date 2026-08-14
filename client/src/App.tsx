@@ -7,6 +7,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CustomAuthProvider } from "./contexts/CustomAuthContext";
 import { SponsorAuthProvider } from "./contexts/SponsorAuthContext";
+import SponsorBridgeLayout from "./components/SponsorBridgeLayout";
+import { OrgAuthGate } from "./components/OrgAuthGate";
 
 // Public pages
 import Home from "./pages/Home";
@@ -154,10 +156,10 @@ function Router() {
       <Route path="/analytics" component={AnalyticsDashboard} />
 
       {/* Events */}
-      <Route path="/events" component={EventsPage} />
+      <Route path="/events" component={() => <OrgAuthGate><EventsPage /></OrgAuthGate>} />
 
       {/* Reports */}
-      <Route path="/reports" component={ReportsPage} />
+      <Route path="/reports" component={() => <OrgAuthGate><ReportsPage /></OrgAuthGate>} />
 
       {/* Safeguarding */}
       <Route path="/safeguarding/incidents" component={IncidentsList} />
@@ -170,10 +172,10 @@ function Router() {
       <Route path="/community" component={CommunityPage} />
 
       {/* Projects (staff) */}
-      <Route path="/projects" component={ProjectsList} />
-      <Route path="/projects/new" component={() => <ProjectForm />} />
-      <Route path="/projects/:id/edit" component={({ params }: { params: { id: string } }) => <ProjectForm projectId={parseInt(params.id)} />} />
-      <Route path="/projects/:id" component={({ params }: { params: { id: string } }) => <ProjectDetail projectId={parseInt(params.id)} />} />
+      <Route path="/projects" component={() => <SponsorBridgeLayout><ProjectsList /></SponsorBridgeLayout>} />
+      <Route path="/projects/new" component={() => <SponsorBridgeLayout><ProjectForm /></SponsorBridgeLayout>} />
+      <Route path="/projects/:id/edit" component={({ params }: { params: { id: string } }) => <SponsorBridgeLayout><ProjectForm projectId={parseInt(params.id)} /></SponsorBridgeLayout>} />
+      <Route path="/projects/:id" component={({ params }: { params: { id: string } }) => <SponsorBridgeLayout><ProjectDetail projectId={parseInt(params.id)} /></SponsorBridgeLayout>} />
 
       {/* Public fundraising pages */}
       <Route path="/fund/:slug" component={({ params }: { params: { slug: string } }) => <FundraisingPage slug={params.slug} />} />

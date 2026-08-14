@@ -160,7 +160,7 @@ export const projectsRouter = router({
     .input(z.object({ id: z.number(), tenantId: z.number() }))
     .query(async ({ ctx, input }) => {
       requireRole(ctx.user.role, STAFF_ROLES);
-      return getProjectById(input.id, input.tenantId);
+      return (await getProjectById(input.id, input.tenantId)) ?? null;
     }),
 
   // ── Public: get project by slug (for fundraising page) ──

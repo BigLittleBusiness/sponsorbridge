@@ -3,7 +3,7 @@
  * Clean split-screen login for the sponsor self-service portal.
  * Supports email/password and OTP magic link.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useSponsorAuth } from "@/contexts/SponsorAuthContext";
 import { Button } from "@/components/ui/button";
@@ -25,11 +25,12 @@ export default function SponsorLoginPage() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Already logged in — redirect
-  if (isAuthenticated) {
-    navigate("/sponsor/dashboard");
-    return null;
-  }
+  // Already logged in — redirect after render to avoid a render-phase navigation.
+  useEffect(() => {
+    if (isAuthenticated) navigate("/sponsor/dashboard");
+  }, [isAuthenticated, navigate]);
+
+  if (isAuthenticated) return null;
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,11 +80,12 @@ export default function SponsorLoginPage() {
       {/* Left panel — warm terracotta */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#C1440E] to-[#a03508] flex-col justify-between p-12 text-white">
         <div>
-          <img
-            src="https://sponsorapp-k6ifqkyq.manus.space/manus-storage/sb-header-light_4f9e2b1c.svg"
-            alt="SponsorBridge"
-            className="h-9 w-auto"
-          />
+          <div className="flex items-center gap-2.5" aria-label="SponsorBridge">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15">
+              <img src="/manus-storage/sb-icon-mark_f15604c9.svg" alt="" className="h-7 w-7" />
+            </span>
+            <span className="text-lg font-bold tracking-tight text-white">SponsorBridge</span>
+          </div>
         </div>
         <div className="space-y-6">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -116,11 +118,10 @@ export default function SponsorLoginPage() {
         <div className="w-full max-w-md space-y-8">
           {/* Mobile logo */}
           <div className="lg:hidden flex justify-center">
-            <img
-              src="https://sponsorapp-k6ifqkyq.manus.space/manus-storage/sb-header-dark_3a1c0e9f.svg"
-              alt="SponsorBridge"
-              className="h-8 w-auto"
-            />
+            <div className="flex items-center gap-2" aria-label="SponsorBridge">
+              <img src="/manus-storage/sb-icon-mark_f15604c9.svg" alt="" className="h-8 w-8" />
+              <span className="text-base font-bold tracking-tight text-[#1a3a2e]">SponsorBridge</span>
+            </div>
           </div>
 
           <div>

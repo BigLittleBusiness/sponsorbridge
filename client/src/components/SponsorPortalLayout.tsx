@@ -3,7 +3,7 @@
  * Warm, light sidebar layout for the sponsor self-service portal.
  * Distinct from the dark-green org dashboard — uses warm cream/terracotta palette.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useSponsorAuth } from "@/contexts/SponsorAuthContext";
 import {
@@ -36,9 +36,24 @@ interface SponsorPortalLayoutProps {
 }
 
 export function SponsorPortalLayout({ children }: SponsorPortalLayoutProps) {
-  const [location] = useLocation();
-  const { sponsor, logout } = useSponsorAuth();
+  const [location, navigate] = useLocation();
+  const { sponsor, logout, isLoading } = useSponsorAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && !sponsor) navigate("/sponsor/login");
+  }, [isLoading, navigate, sponsor]);
+
+  if (isLoading || !sponsor) {
+    return (
+      <div className="min-h-screen bg-[#f9f5f1] flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 rounded-full border-2 border-[#C1440E] border-t-transparent animate-spin mx-auto" />
+          <p className="text-sm text-[#8a7060]">Checking your sponsor portal access…</p>
+        </div>
+      </div>
+    );
+  }
 
   const initials = sponsor
     ? `${sponsor.firstName[0] ?? ""}${sponsor.lastName[0] ?? ""}`.toUpperCase()
@@ -59,7 +74,7 @@ export function SponsorPortalLayout({ children }: SponsorPortalLayoutProps) {
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-[#e8ddd5]">
         <img
-          src="https://sponsorapp-k6ifqkyq.manus.space/manus-storage/sb-icon-mark_7b8d4e2a.svg"
+          src="/manus-storage/sb-icon-mark_f15604c9.svg"
           alt="SponsorBridge"
           className="h-8 w-8"
         />
@@ -93,20 +108,20 @@ export function SponsorPortalLayout({ children }: SponsorPortalLayoutProps) {
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active = location === href || location.startsWith(href + "/");
           return (
-            <Link key={href} href={href}>
-              <a
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
-                  active
-                    ? "bg-[#C1440E] text-white shadow-sm"
-                    : "text-[#4a3728] hover:bg-[#f0e8e0] hover:text-[#1a3a2e]"
-                )}
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                <span>{label}</span>
-                {active && <ChevronRight className="h-3 w-3 ml-auto opacity-70" />}
-              </a>
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setMobileOpen(false)}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
+                active
+                  ? "bg-[#C1440E] text-white shadow-sm"
+                  : "text-[#4a3728] hover:bg-[#f0e8e0] hover:text-[#1a3a2e]"
+              )}
+            >
+              <Icon className="h-4 w-4 shrink-0" />
+              <span>{label}</span>
+              {active && <ChevronRight className="h-3 w-3 ml-auto opacity-70" />}
             </Link>
           );
         })}
@@ -158,7 +173,7 @@ export function SponsorPortalLayout({ children }: SponsorPortalLayoutProps) {
             <Menu className="h-5 w-5" />
           </Button>
           <img
-            src="https://sponsorapp-k6ifqkyq.manus.space/manus-storage/sb-icon-mark_7b8d4e2a.svg"
+            src="/manus-storage/sb-icon-mark_f15604c9.svg"
             alt="SponsorBridge"
             className="h-7 w-7"
           />

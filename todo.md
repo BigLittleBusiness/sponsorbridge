@@ -320,3 +320,24 @@
 - [x] Backend: earlyAccess.signup publicProcedure and earlyAccess.list adminProcedure in routers.ts
 - [x] Frontend: EarlyAccessSection component (form, validation, success/error states, responsive)
 - [x] Home.tsx: EarlyAccessSection inserted directly below hero section, above hero image strip
+
+## Phase 35: Comprehensive UI & Functional Assessment
+- [x] Inventory all routes and create the UI test matrix
+- [x] Test public marketing, pricing, early-access, and campaign donation journeys across desktop and mobile
+- [x] Test authentication screens and validation states
+- [x] Test staff dashboard, child, sponsor, project, reporting, and settings workflows
+- [x] Test sponsor portal navigation, update, payment, profile, and project-contribution views
+- [x] Test system-admin routes, navigation, table states, and access control
+- [x] Fix verified UI, responsive-layout, navigation, or error-state defects
+- [x] Run regression checks, TypeScript, production build, and Vitest suite
+- [ ] Save checkpoint and deliver UI assessment
+- [x] Fix broken SponsorBridge logo image on the sponsor portal login screen
+- [x] Gate staff Projects routes behind the existing charity staff sign-in experience
+- [x] Gate sponsor portal routes behind sponsor sign-in until an authenticated sponsor session is available
+- [x] Replace broken absolute SponsorBridge logo sources in the sponsor portal sidebar and mobile header
+- [x] Gate the custom-auth Org Dashboard, Events, and Reports routes from unauthenticated visitors
+- [x] Repair the Events and Reports staff-sidebar logo asset and incorrect sidebar destinations
+- [x] Prevent unauthenticated access to the New Project creation form and sponsor payment-management interface
+- [x] Generate Community referral links from the active site origin rather than the obsolete Manus subdomain
+- [x] Remove nested anchors in sponsor portal navigation to eliminate the React DOM nesting warning
+- [x] Return an explicit null result for a missing project detail query to eliminate the React Query undefined-data error
