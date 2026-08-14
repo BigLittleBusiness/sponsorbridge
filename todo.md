@@ -350,3 +350,19 @@
 - [x] Add npm scripts, CI workflow integration, and contributor documentation
 - [x] Run smoke suite, TypeScript, Vitest, and production build
 - [x] Save checkpoint and deliver the browser smoke-test suite
+
+## Phase 37: Credentialed Non-Production Browser Journeys (Paused by user — dedicated non-production credentials unavailable)
+- [x] Audit staff, sponsor, and admin authentication flows plus existing test-account constraints
+- [x] Defer secure credential collection until dedicated non-production accounts are available
+- [x] Defer credentialed Playwright journeys for staff, sponsors, and system administrators until credentials are available
+- [x] Defer conditional CI execution and secret-setup documentation until credentials are available
+- [x] Preserve the existing credential-free smoke suite while credentialed journeys are paused
+- [x] Record the paused credentialed browser-journey work for later resumption
+
+## Phase 38: Marketing Pricing & Comparison Review
+- [x] Audit expanded sponsorship copy, pricing-tier inclusions, annual-pricing calculation, and comparison-table data
+- [x] Verify desktop and mobile marketing rendering, pricing controls, CTAs, and comparison-table visibility
+- [x] Fix verified marketing, pricing, comparison-table, or accessibility defects
+- [x] Extend smoke coverage where needed and run regression checks
+- [ ] Save checkpoint and deliver the marketing-site review
+- [x] Make the mobile comparison table horizontally scrollable at a readable minimum width and add a mobile scroll hint

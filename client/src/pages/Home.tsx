@@ -506,8 +506,17 @@ export default function Home() {
               they don't have — accessible to every organisation.
             </p>
           </div>
-          <div className="max-w-3xl mx-auto overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="max-w-3xl mx-auto">
+            <p className="md:hidden text-xs text-muted-foreground mb-2 text-right">
+              Swipe sideways to compare every column
+            </p>
+            <div
+              className="overflow-x-auto rounded-lg border border-border"
+              role="region"
+              aria-label="Feature comparison"
+              tabIndex={0}
+            >
+            <table className="w-full min-w-[720px] text-sm">
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left py-3 px-4 font-semibold text-foreground w-1/2">Feature</th>
@@ -557,6 +566,7 @@ export default function Home() {
                 ))}
               </tbody>
             </table>
+            </div>
             <p className="text-xs text-muted-foreground mt-4 text-center">
               Based on published features of World Vision, Compassion International, and Plan International as of 2025.
             </p>

@@ -20,6 +20,15 @@ test.describe("SponsorBridge core browser smoke tests", () => {
     await expect(page.getByLabel("Email address")).toHaveValue("not-an-email");
   });
 
+  test("marketing comparison presents the expanded sponsorship offer", async ({ page }) => {
+    await page.goto("/");
+
+    await expect(page.getByText("Project & item campaign sponsorship", { exact: true })).toBeVisible();
+    await expect(page.getByText("Public fundraising pages with social sharing", { exact: true })).toBeVisible();
+    await expect(page.getByText("Recurring monthly project contributions", { exact: true })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Feature comparison" })).toBeVisible();
+  });
+
   test("pricing annual toggle updates paid-plan pricing", async ({ page }) => {
     await page.goto("/pricing");
 
@@ -80,5 +89,14 @@ test.describe("SponsorBridge mobile smoke test", () => {
     await expect(page.getByLabel("First name")).toBeVisible();
     await expect(page.getByLabel("Email address")).toBeVisible();
     await expect(page.getByRole("button", { name: "Get Early Access" })).toBeVisible();
+  });
+
+  test("comparison table keeps readable columns through horizontal scrolling", async ({ page }) => {
+    await page.goto("/");
+
+    const comparison = page.getByRole("region", { name: "Feature comparison" });
+    await expect(comparison).toBeVisible();
+    await expect(page.getByText("Swipe sideways to compare every column")).toBeVisible();
+    expect(await comparison.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
   });
 });
