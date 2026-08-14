@@ -341,3 +341,12 @@
 - [x] Generate Community referral links from the active site origin rather than the obsolete Manus subdomain
 - [x] Remove nested anchors in sponsor portal navigation to eliminate the React DOM nesting warning
 - [x] Return an explicit null result for a missing project detail query to eliminate the React Query undefined-data error
+
+## Phase 36: Browser Smoke-Test Suite
+- [x] Audit existing test scripts, CI workflows, and browser-test dependencies
+- [x] Add Playwright configuration with deterministic local web-server startup
+- [x] Add public-site smoke tests for marketing, pricing, validation, and campaign fallback flows
+- [x] Add authentication and access-control smoke tests for staff and sponsor routes
+- [x] Add npm scripts, CI workflow integration, and contributor documentation
+- [x] Run smoke suite, TypeScript, Vitest, and production build
+- [ ] Save checkpoint and deliver the browser smoke-test suite
