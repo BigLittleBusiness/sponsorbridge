@@ -364,5 +364,5 @@
 - [x] Verify desktop and mobile marketing rendering, pricing controls, CTAs, and comparison-table visibility
 - [x] Fix verified marketing, pricing, comparison-table, or accessibility defects
 - [x] Extend smoke coverage where needed and run regression checks
-- [ ] Save checkpoint and deliver the marketing-site review
+- [x] Save checkpoint and deliver the marketing-site review
 - [x] Make the mobile comparison table horizontally scrollable at a readable minimum width and add a mobile scroll hint
