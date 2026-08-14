@@ -330,7 +330,7 @@
 - [x] Test system-admin routes, navigation, table states, and access control
 - [x] Fix verified UI, responsive-layout, navigation, or error-state defects
 - [x] Run regression checks, TypeScript, production build, and Vitest suite
-- [ ] Save checkpoint and deliver UI assessment
+- [x] Save checkpoint and deliver UI assessment
 - [x] Fix broken SponsorBridge logo image on the sponsor portal login screen
 - [x] Gate staff Projects routes behind the existing charity staff sign-in experience
 - [x] Gate sponsor portal routes behind sponsor sign-in until an authenticated sponsor session is available
