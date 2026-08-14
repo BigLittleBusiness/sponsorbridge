@@ -372,5 +372,5 @@
 - [x] Track pricing-tier CTA, annual-toggle, campaign-preview, and comparison-table interactions without collecting personal data
 - [x] Add a subtle reduced-motion-safe mobile pulse to the comparison swipe hint
 - [x] Extend browser smoke coverage and run TypeScript, unit, browser, and production-build checks
-- [ ] Save checkpoint and deliver the conversion improvements
+- [x] Save checkpoint and deliver the conversion improvements
 - [x] Make the mobile comparison table horizontally scrollable at a readable minimum width and add a mobile scroll hint
