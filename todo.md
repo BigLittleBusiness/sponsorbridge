@@ -349,4 +349,4 @@
 - [x] Add authentication and access-control smoke tests for staff and sponsor routes
 - [x] Add npm scripts, CI workflow integration, and contributor documentation
 - [x] Run smoke suite, TypeScript, Vitest, and production build
-- [ ] Save checkpoint and deliver the browser smoke-test suite
+- [x] Save checkpoint and deliver the browser smoke-test suite
