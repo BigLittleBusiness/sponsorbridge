@@ -23,8 +23,10 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Link } from "wouter";
+import { useRef } from "react";
 import { useCustomAuth } from "@/contexts/CustomAuthContext";
 import { EarlyAccessSection } from "@/components/EarlyAccessSection";
+import { trackConversion } from "@/lib/conversionAnalytics";
 
 const FEATURES = [
   {
@@ -169,6 +171,16 @@ const COMPARISON: { feature: string; large: boolean; small: boolean; note?: stri
 
 export default function Home() {
   const { account } = useCustomAuth();
+  const comparisonInteractionSent = useRef(false);
+
+  const trackComparisonInteraction = (interaction: "scroll" | "focus") => {
+    if (comparisonInteractionSent.current) return;
+    comparisonInteractionSent.current = true;
+    trackConversion("marketing_comparison_interacted", {
+      interaction,
+      viewport: window.innerWidth < 768 ? "mobile" : "desktop",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-warm-linen">
@@ -507,7 +519,7 @@ export default function Home() {
             </p>
           </div>
           <div className="max-w-3xl mx-auto">
-            <p className="md:hidden text-xs text-muted-foreground mb-2 text-right">
+            <p className="comparison-swipe-hint md:hidden text-xs text-muted-foreground mb-2 text-right" aria-live="polite">
               Swipe sideways to compare every column
             </p>
             <div
@@ -515,6 +527,8 @@ export default function Home() {
               role="region"
               aria-label="Feature comparison"
               tabIndex={0}
+              onScroll={() => trackComparisonInteraction("scroll")}
+              onFocus={() => trackComparisonInteraction("focus")}
             >
             <table className="w-full min-w-[720px] text-sm">
               <thead>

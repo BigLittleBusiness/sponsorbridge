@@ -204,5 +204,16 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
+
+    @media (max-width: 767px) {
+      .comparison-swipe-hint {
+        animation: comparisonSwipeHint 1.8s var(--ease-in-out) 3;
+      }
+      @keyframes comparisonSwipeHint {
+        0%, 100% { opacity: 0.58; transform: translateX(0); }
+        45% { opacity: 1; transform: translateX(-5px); }
+        65% { opacity: 1; transform: translateX(5px); }
+      }
+    }
   }
 }

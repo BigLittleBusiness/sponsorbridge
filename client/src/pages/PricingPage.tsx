@@ -8,6 +8,7 @@ import {
   Share2, TrendingUp
 } from "lucide-react";
 import { useCustomAuth } from "@/contexts/CustomAuthContext";
+import { trackConversion } from "@/lib/conversionAnalytics";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -256,13 +257,19 @@ export default function PricingPage() {
           <div className="inline-flex items-center gap-3 bg-white border border-border rounded-full px-4 py-2">
             <button
               className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${!annual ? "bg-terracotta text-white" : "text-muted-foreground"}`}
-              onClick={() => setAnnual(false)}
+              onClick={() => {
+                setAnnual(false);
+                trackConversion("pricing_billing_toggle", { billing_period: "monthly" });
+              }}
             >
               Monthly
             </button>
             <button
               className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${annual ? "bg-terracotta text-white" : "text-muted-foreground"}`}
-              onClick={() => setAnnual(true)}
+              onClick={() => {
+                setAnnual(true);
+                trackConversion("pricing_billing_toggle", { billing_period: "annual" });
+              }}
             >
               Annual
               <span className="ml-1.5 text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-semibold">
@@ -303,7 +310,16 @@ export default function PricingPage() {
                 <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{tier.description}</p>
               </div>
 
-              <a href={getCtaHref(tier)} target={tier.key === "enterprise" ? "_blank" : undefined}>
+              <a
+                href={getCtaHref(tier)}
+                target={tier.key === "enterprise" ? "_blank" : undefined}
+                rel={tier.key === "enterprise" ? "noreferrer" : undefined}
+                onClick={() => trackConversion("pricing_tier_cta_clicked", {
+                  tier: tier.key,
+                  billing_period: annual ? "annual" : "monthly",
+                  destination: tier.key === "enterprise" ? "contact" : "registration",
+                })}
+              >
                 <Button
                   variant={tier.ctaVariant}
                   className={`w-full mb-5 ${tier.ctaVariant === "default" ? "bg-terracotta hover:bg-terracotta/90 text-white" : ""}`}
@@ -360,9 +376,18 @@ export default function PricingPage() {
                 ))}
               </div>
             </div>
-            <div className="shrink-0">
+            <div className="shrink-0 flex flex-col gap-2 w-full md:w-auto">
+              <Link href="/campaign-preview">
+                <Button
+                  variant="outline"
+                  className="w-full border-amber-400 text-amber-900 hover:bg-amber-100 whitespace-nowrap"
+                  onClick={() => trackConversion("pricing_campaign_preview_clicked", { placement: "project_campaign_callout" })}
+                >
+                  View live campaign preview
+                </Button>
+              </Link>
               <Link href="/register">
-                <Button className="bg-amber-600 hover:bg-amber-700 text-white whitespace-nowrap">
+                <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white whitespace-nowrap">
                   Start free trial <ArrowRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>

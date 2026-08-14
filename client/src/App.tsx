@@ -14,6 +14,7 @@ import { OrgAuthGate } from "./components/OrgAuthGate";
 import Home from "./pages/Home";
 import PolicyAck from "./pages/PolicyAck";
 import PricingPage from "./pages/PricingPage";
+import CampaignPreviewPage from "./pages/projects/CampaignPreviewPage";
 
 // Custom auth pages
 import RegisterPage from "./pages/auth/RegisterPage";
@@ -113,6 +114,7 @@ function Router() {
       {/* Public marketing */}
       <Route path="/" component={Home} />
       <Route path="/pricing" component={PricingPage} />
+      <Route path="/campaign-preview" component={CampaignPreviewPage} />
       <Route path="/policy" component={PolicyAck} />
 
       {/* Custom auth */}

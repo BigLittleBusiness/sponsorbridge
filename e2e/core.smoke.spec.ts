@@ -40,6 +40,29 @@ test.describe("SponsorBridge core browser smoke tests", () => {
     await expect(page.getByText("billed annually").first()).toBeVisible();
   });
 
+  test("pricing campaign preview illustrates the donor journey and emits aggregate conversion events", async ({ page }) => {
+    await page.addInitScript(() => {
+      (window as unknown as { __conversionEvents: Array<{ name: string; properties?: Record<string, unknown> }> }).__conversionEvents = [];
+      window.umami = {
+        track: (name, properties) => {
+          (window as unknown as { __conversionEvents: Array<{ name: string; properties?: Record<string, unknown> }> }).__conversionEvents.push({ name, properties });
+        },
+      };
+    });
+
+    await page.goto("/pricing");
+    await page.getByRole("button", { name: /Annual/ }).click();
+    await page.getByRole("button", { name: "View live campaign preview" }).click();
+
+    await expect(page).toHaveURL(/\/campaign-preview$/);
+    await expect(page.getByRole("heading", { name: "Clean water for Mtoni Primary School" })).toBeVisible();
+    await expect(page.getByText("Donation controls are disabled in this illustrative preview.")).toBeVisible();
+
+    const events = await page.evaluate(() => (window as unknown as { __conversionEvents: Array<{ name: string; properties?: Record<string, unknown> }> }).__conversionEvents);
+    expect(events).toContainEqual({ name: "pricing_billing_toggle", properties: { billing_period: "annual" } });
+    expect(events).toContainEqual({ name: "pricing_campaign_preview_clicked", properties: { placement: "project_campaign_callout" } });
+  });
+
   test("organisation registration blocks an empty first step", async ({ page }) => {
     await page.goto("/register");
 
@@ -98,5 +121,29 @@ test.describe("SponsorBridge mobile smoke test", () => {
     await expect(comparison).toBeVisible();
     await expect(page.getByText("Swipe sideways to compare every column")).toBeVisible();
     expect(await comparison.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  });
+
+  test("comparison scroll tracking is aggregate-only and the motion hint respects reduced motion", async ({ page }) => {
+    await page.addInitScript(() => {
+      (window as unknown as { __conversionEvents: Array<{ name: string; properties?: Record<string, unknown> }> }).__conversionEvents = [];
+      window.umami = {
+        track: (name, properties) => {
+          (window as unknown as { __conversionEvents: Array<{ name: string; properties?: Record<string, unknown> }> }).__conversionEvents.push({ name, properties });
+        },
+      };
+    });
+
+    await page.goto("/");
+    const comparison = page.getByRole("region", { name: "Feature comparison" });
+    await comparison.evaluate((element) => {
+      element.scrollLeft = 24;
+      element.dispatchEvent(new Event("scroll", { bubbles: true }));
+    });
+    await expect.poll(async () => page.evaluate(() => (window as unknown as { __conversionEvents: Array<{ name: string }> }).__conversionEvents.map((event) => event.name))).toContain("marketing_comparison_interacted");
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.reload();
+    const animationName = await page.getByText("Swipe sideways to compare every column").evaluate((element) => getComputedStyle(element).animationName);
+    expect(animationName).toBe("none");
   });
 });

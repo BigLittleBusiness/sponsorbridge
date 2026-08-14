@@ -365,4 +365,12 @@
 - [x] Fix verified marketing, pricing, comparison-table, or accessibility defects
 - [x] Extend smoke coverage where needed and run regression checks
 - [x] Save checkpoint and deliver the marketing-site review
+
+## Phase 39: Expanded Sponsorship Conversion Improvements
+- [x] Audit public campaign routes, existing analytics hook points, and mobile motion styles
+- [x] Add a live campaign preview link to the pricing page with graceful unavailable-campaign behavior
+- [x] Track pricing-tier CTA, annual-toggle, campaign-preview, and comparison-table interactions without collecting personal data
+- [x] Add a subtle reduced-motion-safe mobile pulse to the comparison swipe hint
+- [x] Extend browser smoke coverage and run TypeScript, unit, browser, and production-build checks
+- [ ] Save checkpoint and deliver the conversion improvements
 - [x] Make the mobile comparison table horizontally scrollable at a readable minimum width and add a mobile scroll hint
