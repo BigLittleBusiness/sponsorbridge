@@ -385,7 +385,7 @@
 - [x] Audit responsive UI and all accessible unauthenticated staff, sponsor, and admin access-control flows
 - [x] Review browser/server runtime logs and fix verified launch-blocking defects
 - [x] Document credential-dependent journeys that cannot be completed without dedicated test accounts
-- [ ] Save checkpoint and deliver launch-readiness assessment
+- [x] Save checkpoint and deliver launch-readiness assessment
 
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
