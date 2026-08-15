@@ -10,8 +10,10 @@
     "check": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:smoke": "playwright test",
+    "test:smoke": "playwright test e2e/core.smoke.spec.ts",
     "test:smoke:ui": "playwright test --ui",
+    "e2e:seed": "NODE_ENV=test node scripts/seed-e2e-accounts.mjs",
+    "test:smoke:authenticated": "pnpm e2e:seed && playwright test e2e/authenticated.smoke.spec.ts",
     "db:push": "drizzle-kit generate && drizzle-kit migrate"
   },
   "dependencies": {

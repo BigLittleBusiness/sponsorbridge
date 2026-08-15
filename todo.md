@@ -387,6 +387,15 @@
 - [x] Document credential-dependent journeys that cannot be completed without dedicated test accounts
 - [x] Save checkpoint and deliver launch-readiness assessment
 
+## Phase 42: Dedicated Credentialed Test Accounts
+- [x] Audit current custom account, sponsor portal, tenant, and test-data relationships
+- [x] Create isolated non-production staff, sponsor, and system-admin accounts with safe linked records
+- [x] Configure browser-test credential variables without committing passwords
+- [x] Add and run credentialed staff, sponsor, and system-admin Playwright journeys
+- [x] Document account reset and secure CI configuration
+- [ ] Save checkpoint and deliver credentialed test-account setup
+- [x] Map valid custom-auth sessions to their matching app user in tRPC context so system-admin data queries do not redirect to Manus OAuth
+
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
 - [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states

@@ -62,6 +62,22 @@ jobs:
           VITE_FRONTEND_FORGE_API_KEY: test-key
           VITE_FRONTEND_FORGE_API_URL: https://api.manus.im
 
+      - name: Run credentialed browser smoke tests
+        if: ${{ secrets.E2E_TEST_PASSWORD != '' && secrets.DATABASE_URL != '' }}
+        run: pnpm test:smoke:authenticated
+        env:
+          CI: true
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          JWT_SECRET: test-jwt-secret-ci
+          VITE_APP_ID: test-app-id
+          OAUTH_SERVER_URL: https://api.manus.im
+          VITE_OAUTH_PORTAL_URL: https://auth.manus.im
+          BUILT_IN_FORGE_API_URL: https://api.manus.im
+          BUILT_IN_FORGE_API_KEY: test-key
+          VITE_FRONTEND_FORGE_API_KEY: test-key
+          VITE_FRONTEND_FORGE_API_URL: https://api.manus.im
+
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
