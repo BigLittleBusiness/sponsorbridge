@@ -393,7 +393,7 @@
 - [x] Configure browser-test credential variables without committing passwords
 - [x] Add and run credentialed staff, sponsor, and system-admin Playwright journeys
 - [x] Document account reset and secure CI configuration
-- [ ] Save checkpoint and deliver credentialed test-account setup
+- [x] Save checkpoint and deliver credentialed test-account setup
 - [x] Map valid custom-auth sessions to their matching app user in tRPC context so system-admin data queries do not redirect to Manus OAuth
 
 ## Phase 40: Comparison Table Simplification
