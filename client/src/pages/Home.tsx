@@ -520,7 +520,7 @@ export default function Home() {
           </div>
           <div className="max-w-3xl mx-auto">
             <p className="comparison-swipe-hint md:hidden text-xs text-muted-foreground mb-2 text-right" aria-live="polite">
-              Swipe sideways to compare every column
+              Swipe sideways to compare both columns
             </p>
             <div
               className="overflow-x-auto rounded-lg border border-border"
@@ -530,17 +530,11 @@ export default function Home() {
               onScroll={() => trackComparisonInteraction("scroll")}
               onFocus={() => trackComparisonInteraction("focus")}
             >
-            <table className="w-full min-w-[720px] text-sm">
+            <table className="w-full min-w-[620px] text-sm">
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left py-3 px-4 font-semibold text-foreground w-1/2">Feature</th>
-                  <th className="text-center py-3 px-4 font-semibold text-foreground">
-                    Large orgs
-                    <div className="text-xs font-normal text-muted-foreground">(World Vision, Compassion)</div>
-                  </th>
-                  <th className="text-center py-3 px-4 font-semibold text-foreground">
-                    Without SponsorBridge
-                  </th>
+                  <th className="text-center py-3 px-4 font-semibold text-foreground">Large organisations</th>
                   <th className="text-center py-3 px-4 font-semibold text-terracotta">
                     With SponsorBridge
                   </th>
@@ -570,9 +564,6 @@ export default function Home() {
                         <span className="text-muted-foreground/40 text-lg leading-none">✗</span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-center text-muted-foreground/40 text-lg leading-none">
-                      ✗
-                    </td>
                     <td className="py-3 px-4 text-center">
                       <CheckCircle2 className="w-4 h-4 text-green-600 mx-auto" />
                     </td>
@@ -582,7 +573,7 @@ export default function Home() {
             </table>
             </div>
             <p className="text-xs text-muted-foreground mt-4 text-center">
-              Based on published features of World Vision, Compassion International, and Plan International as of 2025.
+              Comparison based on publicly available capability information as of 2025.
             </p>
           </div>
         </div>

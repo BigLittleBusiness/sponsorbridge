@@ -373,4 +373,22 @@
 - [x] Add a subtle reduced-motion-safe mobile pulse to the comparison swipe hint
 - [x] Extend browser smoke coverage and run TypeScript, unit, browser, and production-build checks
 - [x] Save checkpoint and deliver the conversion improvements
+
+## Phase 40: Comparison Table Simplification
+- [x] Remove named large organisations from the comparison description and label
+- [x] Remove the Without SponsorBridge column, retaining Feature, Large organisations, and With SponsorBridge
+- [x] Verify desktop and mobile presentation and run regression checks
+
+## Phase 41: SponsorBridge Launch-Readiness Validation
+- [x] Run static analysis, unit tests, browser smoke tests, and production build
+- [x] Audit public marketing, pricing, early access, campaign preview, and public campaign fallback flows
+- [x] Audit responsive UI and all accessible unauthenticated staff, sponsor, and admin access-control flows
+- [x] Review browser/server runtime logs and fix verified launch-blocking defects
+- [x] Document credential-dependent journeys that cannot be completed without dedicated test accounts
+- [ ] Save checkpoint and deliver launch-readiness assessment
+
+## Phase 40: Comparison Table Simplification
+- [x] Remove named large organisations from the comparison heading and column label
+- [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states
+- [x] Verify the simplified table on desktop and mobile and run regressions
 - [x] Make the mobile comparison table horizontally scrollable at a readable minimum width and add a mobile scroll hint

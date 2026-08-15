@@ -119,7 +119,7 @@ test.describe("SponsorBridge mobile smoke test", () => {
 
     const comparison = page.getByRole("region", { name: "Feature comparison" });
     await expect(comparison).toBeVisible();
-    await expect(page.getByText("Swipe sideways to compare every column")).toBeVisible();
+    await expect(page.getByText("Swipe sideways to compare both columns")).toBeVisible();
     expect(await comparison.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
   });
 
@@ -143,7 +143,7 @@ test.describe("SponsorBridge mobile smoke test", () => {
 
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.reload();
-    const animationName = await page.getByText("Swipe sideways to compare every column").evaluate((element) => getComputedStyle(element).animationName);
+    const animationName = await page.getByText("Swipe sideways to compare both columns").evaluate((element) => getComputedStyle(element).animationName);
     expect(animationName).toBe("none");
   });
 });
