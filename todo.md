@@ -401,7 +401,7 @@
 - [x] Add the GitHub repository secret for the browser-test password; the database now uses an ephemeral CI service
 - [x] Replace persistent CI database configuration with an ephemeral GitHub Actions MySQL service
 - [x] Verify the repository secret names and CI gating without exposing values
-- [ ] Save checkpoint and deliver the credentialed CI secret configuration
+- [x] Save checkpoint and deliver the credentialed CI secret configuration
 
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
