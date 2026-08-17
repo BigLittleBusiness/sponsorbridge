@@ -44,10 +44,9 @@ For GitHub Actions, add the following **repository secrets** in the SponsorBridg
 
 | Secret | Value |
 |---|---|
-| `DATABASE_URL` | A dedicated, disposable non-production MySQL/TiDB database URL. |
 | `E2E_TEST_PASSWORD` | The same unique strong password used by the non-production E2E accounts. |
 
-CI runs the credentialed suite only when both secrets are present. The browser-test database must not contain production data.
+CI provisions an ephemeral MySQL service and applies migrations for every run, so `DATABASE_URL` is **not** a GitHub repository secret. CI runs the credentialed suite only when `E2E_TEST_PASSWORD` is present. The browser-test database is discarded when the workflow finishes.
 
 For interactive debugging, run:
 
@@ -81,4 +80,4 @@ PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000 pnpm test:smoke
 | Credentialed sponsor | A dedicated sponsor signs in and sees the safe sponsored-child fixture. |
 | Credentialed administrator | A dedicated system-admin account signs in and accesses System Administration. |
 
-The GitHub Actions CI workflow installs Chromium, runs the baseline suite after unit tests, and runs credentialed journeys only when both `DATABASE_URL` and `E2E_TEST_PASSWORD` are configured as repository secrets. It uploads the Playwright HTML report if either browser suite fails.
+The GitHub Actions CI workflow installs Chromium, starts an ephemeral MySQL service, runs the baseline suite after unit tests, and runs credentialed journeys only when `E2E_TEST_PASSWORD` is configured as a repository secret. It uploads the Playwright HTML report if either browser suite fails.

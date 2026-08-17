@@ -396,6 +396,13 @@
 - [x] Save checkpoint and deliver credentialed test-account setup
 - [x] Map valid custom-auth sessions to their matching app user in tRPC context so system-admin data queries do not redirect to Manus OAuth
 
+## Phase 43: GitHub Credentialed CI Secrets
+- [x] Inspect GitHub authentication and identify required non-production secret sources
+- [x] Add the GitHub repository secret for the browser-test password; the database now uses an ephemeral CI service
+- [x] Replace persistent CI database configuration with an ephemeral GitHub Actions MySQL service
+- [x] Verify the repository secret names and CI gating without exposing values
+- [ ] Save checkpoint and deliver the credentialed CI secret configuration
+
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
 - [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states

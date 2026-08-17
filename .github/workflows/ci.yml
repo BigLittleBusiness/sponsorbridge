@@ -10,6 +10,24 @@ jobs:
   test-and-build:
     name: Test & Build
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: mysql://sponsorbridge_ci:sponsorbridge_ci_password@127.0.0.1:3306/sponsorbridge_ci
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: sponsorbridge_ci
+          MYSQL_USER: sponsorbridge_ci
+          MYSQL_PASSWORD: sponsorbridge_ci_password
+          MYSQL_ROOT_PASSWORD: root_ci_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot_ci_password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     steps:
       - name: Checkout code
@@ -29,13 +47,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Apply disposable database migrations
+        run: pnpm drizzle-kit migrate
+
       - name: TypeScript type-check
         run: pnpm tsc --noEmit
 
       - name: Run unit tests
         run: pnpm test
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: test-jwt-secret-ci
           VITE_APP_ID: test-app-id
           OAUTH_SERVER_URL: https://api.manus.im
@@ -52,7 +72,6 @@ jobs:
         run: pnpm test:smoke
         env:
           CI: true
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: test-jwt-secret-ci
           VITE_APP_ID: test-app-id
           OAUTH_SERVER_URL: https://api.manus.im
@@ -63,11 +82,10 @@ jobs:
           VITE_FRONTEND_FORGE_API_URL: https://api.manus.im
 
       - name: Run credentialed browser smoke tests
-        if: ${{ secrets.E2E_TEST_PASSWORD != '' && secrets.DATABASE_URL != '' }}
+        if: ${{ secrets.E2E_TEST_PASSWORD != '' }}
         run: pnpm test:smoke:authenticated
         env:
           CI: true
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
           JWT_SECRET: test-jwt-secret-ci
           VITE_APP_ID: test-app-id
@@ -89,7 +107,6 @@ jobs:
       - name: Build production bundle
         run: pnpm build
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           VITE_APP_ID: ${{ secrets.VITE_APP_ID }}
           OAUTH_SERVER_URL: ${{ secrets.OAUTH_SERVER_URL }}
