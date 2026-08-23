@@ -403,6 +403,12 @@
 - [x] Verify the repository secret names and CI gating without exposing values
 - [x] Save checkpoint and deliver the credentialed CI secret configuration
 
+## Phase 44: Render Deployment Guide
+- [x] Audit SponsorBridge deployment configuration and verify current Render documentation
+- [x] Draft a phased Render deployment guide for staging and production
+- [x] Review the guide for security, data migration, domain, Stripe, email, storage, and rollback safety
+- [ ] Save checkpoint and deliver the deployment guide
+
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
 - [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states
