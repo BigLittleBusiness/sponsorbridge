@@ -407,7 +407,7 @@
 - [x] Audit SponsorBridge deployment configuration and verify current Render documentation
 - [x] Draft a phased Render deployment guide for staging and production
 - [x] Review the guide for security, data migration, domain, Stripe, email, storage, and rollback safety
-- [ ] Save checkpoint and deliver the deployment guide
+- [x] Save checkpoint and deliver the deployment guide
 
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
