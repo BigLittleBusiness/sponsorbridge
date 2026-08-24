@@ -409,6 +409,13 @@
 - [x] Review the guide for security, data migration, domain, Stripe, email, storage, and rollback safety
 - [x] Save checkpoint and deliver the deployment guide
 
+## Phase 45: DigitalOcean Cost Comparison & Migration Guide
+- [x] Collect official pricing and deployment guidance for Render, DigitalOcean, and AWS
+- [x] Model transparent monthly cost scenarios for SponsorBridge in USD and AUD
+- [x] Map the exact DigitalOcean Spaces portability changes for current Manus-specific storage
+- [x] Draft and review the staged DigitalOcean App Platform + Managed MySQL migration guide
+- [ ] Save checkpoint and deliver the comparison and guide
+
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
 - [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states
