@@ -416,6 +416,11 @@
 - [x] Draft and review the staged DigitalOcean App Platform + Managed MySQL migration guide
 - [x] Save checkpoint and deliver the comparison and guide
 
+## Phase 46: Founder-to-Developer DigitalOcean Handover Checklist
+- [x] Define founder-retained ownership, recovery, billing, approval, and security controls
+- [x] Draft the developer handover checklist for staging and production deployment
+- [x] Review the checklist for clarity and save checkpoint for delivery
+
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
 - [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states
