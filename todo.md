@@ -426,6 +426,11 @@
 - [x] Draft step-by-step founder instructions for each required preparation action
 - [x] Review, checkpoint, and deliver the founder-only checklist
 
+## Phase 48: Founder Billing and DNS Preparation
+- [x] Confirm the current DigitalOcean billing-monitoring path and founder fallback controls
+- [x] Record Panthur as the domain registrar and preserve existing records until staging cutover
+- [x] Deliver the founder’s remaining DigitalOcean billing and DNS preparation steps
+
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
 - [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states
