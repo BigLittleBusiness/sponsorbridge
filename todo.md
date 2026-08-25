@@ -421,6 +421,11 @@
 - [x] Draft the developer handover checklist for staging and production deployment
 - [x] Review the checklist for clarity and save checkpoint for delivery
 
+## Phase 47: Founder-Only DigitalOcean Preparation Checklist
+- [x] Verify founder-owned DigitalOcean account, team security, billing, and recovery steps
+- [x] Draft step-by-step founder instructions for each required preparation action
+- [x] Review, checkpoint, and deliver the founder-only checklist
+
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
 - [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states
