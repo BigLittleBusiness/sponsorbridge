@@ -431,6 +431,16 @@
 - [x] Record Panthur as the domain registrar and preserve existing records until staging cutover
 - [x] Deliver the founder’s remaining DigitalOcean billing and DNS preparation steps
 
+## Phase 49: Founder Stripe Setup Checklist
+- [x] Audit SponsorBridge payment code and current Stripe setup guidance
+- [x] Draft founder-facing test-mode and live-mode Stripe setup steps
+- [x] Review, checkpoint, and deliver the Stripe setup checklist
+
+## Phase 49: Founder Stripe Setup Checklist (Duplicate entry — superseded)
+- [x] Duplicate audit item superseded by the active Phase 49 checklist above
+- [x] Duplicate drafting item superseded by the active Phase 49 checklist above
+- [x] Duplicate review item superseded by the active Phase 49 checklist above
+
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
 - [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states
