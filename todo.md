@@ -441,6 +441,18 @@
 - [x] Duplicate drafting item superseded by the active Phase 49 checklist above
 - [x] Duplicate review item superseded by the active Phase 49 checklist above
 
+## Phase 50: Manus Domain, Email, and Stripe Live-Mode Guide
+- [x] Verify SponsorBridge’s domain, email, and Stripe runtime requirements
+- [x] Draft founder steps for connecting app.sponsorbridge.com to Manus
+- [x] Draft founder steps for SES/SMTP email sending and Stripe live-mode keys/webhooks
+- [x] Review, checkpoint, and deliver the launch configuration guide
+
+## Phase 50: Manus Domain, Email, and Stripe Live-Mode Guide (Duplicate entry — superseded)
+- [x] Duplicate audit item superseded by the active Phase 50 checklist above
+- [x] Duplicate domain task superseded by the active Phase 50 checklist above
+- [x] Duplicate email and Stripe task superseded by the active Phase 50 checklist above
+- [x] Duplicate review item superseded by the active Phase 50 checklist above
+
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
 - [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states
