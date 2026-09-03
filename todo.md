@@ -453,6 +453,23 @@
 - [x] Duplicate email and Stripe task superseded by the active Phase 50 checklist above
 - [x] Duplicate review item superseded by the active Phase 50 checklist above
 
+## Phase 51: PurelyMail DNS Diagnosis
+- [x] Check the visible NTC PurelyMail records against public authoritative DNS
+- [x] Identify the likely verification issue and give founder-safe correction steps
+
+## Phase 52: BinaryLane 4 GB Sydney VPS Deployment Kit
+- [x] Audit current Docker, server, database, migration, storage, and webhook deployment needs
+- [x] Add a Docker Compose production stack, Caddy HTTPS proxy, environment template, and backup/migration scripts
+- [x] Draft the founder-friendly BinaryLane 4 GB Sydney VPS setup and operations guide
+- [x] Validate the deployment kit and run TypeScript, unit, browser, build, and configuration checks
+- [x] Add a lightweight unauthenticated health endpoint matching the Docker health check
+- [x] Restore the missing environment import required by the conditional OAuth route registration
+- [x] Replace hard-coded Manus project links in email templates with a configurable canonical application URL
+- [x] Add portable-storage and health-endpoint test coverage
+- [x] Add a secret-protected host scheduler path for onboarding work that currently relies on Manus cron authentication
+- [x] Configure separate webhook secrets for child-sponsorship and project-contribution Stripe endpoints
+- [x] Ignore BinaryLane runtime environment files so production secrets cannot be committed
+
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
 - [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states

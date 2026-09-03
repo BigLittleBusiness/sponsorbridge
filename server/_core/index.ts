@@ -3,6 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import { ENV } from "./env";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
@@ -38,6 +39,10 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
+  app.get("/api/health", (_req, res) => {
+    res.status(200).json({ status: "ok", service: "sponsorbridge" });
+  });
+
   // Stripe webhook MUST be registered before express.json() so it receives raw body for signature verification
   registerStripeRoutes(app);
 
@@ -58,7 +63,11 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   app.use(cookieParser());
   registerStorageProxy(app);
-  registerOAuthRoutes(app);
+  if (ENV.oAuthServerUrl && ENV.appId) {
+    registerOAuthRoutes(app);
+  } else {
+    console.info("[OAuth] Manus OAuth routes disabled: custom authentication remains available.");
+  }
 
   // Custom auth routes (registration, OTP, login for charity admins)
   app.use("/api/auth", customAuthRouter);

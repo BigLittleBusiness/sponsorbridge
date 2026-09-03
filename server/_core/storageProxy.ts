@@ -1,5 +1,10 @@
 import type { Express } from "express";
 import { ENV } from "./env";
+import { isPortableStorageEnabled, storageGetSignedUrl } from "../storage";
+
+function encodeKeyForPath(key: string) {
+  return key.split("/").map(encodeURIComponent).join("/");
+}
 
 export function registerStorageProxy(app: Express) {
   app.get("/manus-storage/*", async (req, res) => {
@@ -10,7 +15,12 @@ export function registerStorageProxy(app: Express) {
     }
 
     if (!ENV.forgeApiUrl || !ENV.forgeApiKey) {
-      res.status(500).send("Storage proxy not configured");
+      if (ENV.legacyManusStorageOrigin) {
+        const origin = ENV.legacyManusStorageOrigin.replace(/\/+$/, "");
+        res.redirect(307, `${origin}/manus-storage/${encodeKeyForPath(key)}`);
+        return;
+      }
+      res.status(410).send("Legacy storage is unavailable; migrate this media record.");
       return;
     }
 
@@ -43,6 +53,27 @@ export function registerStorageProxy(app: Express) {
     } catch (err) {
       console.error("[StorageProxy] failed:", err);
       res.status(502).send("Storage proxy error");
+    }
+  });
+
+  app.get("/media/*", async (req, res) => {
+    const key = (req.params as Record<string, string>)[0];
+    if (!key) {
+      res.status(400).send("Missing storage key");
+      return;
+    }
+    if (!isPortableStorageEnabled()) {
+      res.status(404).send("Portable storage is not enabled");
+      return;
+    }
+
+    try {
+      const signedUrl = await storageGetSignedUrl(key);
+      res.set("Cache-Control", "private, no-store");
+      res.redirect(307, signedUrl);
+    } catch (err) {
+      console.error("[StorageProxy] portable storage failed:", err);
+      res.status(502).send("Storage backend error");
     }
   });
 }

@@ -50,6 +50,11 @@ function slugify(text: string): string {
     .substring(0, 80);
 }
 
+function getPublicProjectUrl(projectSlug: string) {
+  const baseUrl = (ENV.appBaseUrl || "https://sponsorapp-k6ifqkyq.manus.space").replace(/\/+$/, "");
+  return `${baseUrl}/fund/${encodeURIComponent(projectSlug)}`;
+}
+
 // ─── SES EMAIL HELPER ─────────────────────────────────────────────────────────
 // In production on AWS, replace this with the SES SDK call.
 // The function signature and parameters are SES-ready.
@@ -94,7 +99,7 @@ async function sendContributionConfirmationEmail(opts: {
         <h2 style="color:#c1440e">Thank you, ${opts.name}!</h2>
         <p>Your ${freq} contribution of <strong>${opts.currency} $${amount}</strong> to <strong>${opts.projectTitle}</strong> has been received.</p>
         <p>You'll receive updates from the charity as the project progresses.</p>
-        <a href="https://sponsorapp-k6ifqkyq.manus.space/projects/${opts.projectSlug}"
+        <a href="${getPublicProjectUrl(opts.projectSlug)}"
            style="display:inline-block;background:#c1440e;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;margin-top:16px">
           View Project
         </a>
@@ -120,7 +125,7 @@ async function sendProjectUpdateEmail(opts: {
           <h2 style="color:#c1440e">Project Update: ${opts.projectTitle}</h2>
           <h3>${opts.updateTitle}</h3>
           <p>${opts.updateContent}</p>
-          <a href="https://sponsorapp-k6ifqkyq.manus.space/projects/${opts.projectSlug}"
+          <a href="${getPublicProjectUrl(opts.projectSlug)}"
              style="display:inline-block;background:#c1440e;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;margin-top:16px">
             View Project
           </a>
@@ -469,14 +474,14 @@ export const projectsRouter = router({
 // Route: POST /api/projects/webhook
 
 export async function handleProjectStripeWebhook(rawBody: Buffer, signature: string) {
-  if (!ENV.stripeSecretKey || !ENV.stripeWebhookSecret) {
+  if (!ENV.stripeSecretKey || !ENV.stripeProjectWebhookSecret) {
     throw new Error("Stripe not configured");
   }
   const stripe = new Stripe(ENV.stripeSecretKey, { apiVersion: "2026-06-24.dahlia" });
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(rawBody, signature, ENV.stripeWebhookSecret);
+    event = stripe.webhooks.constructEvent(rawBody, signature, ENV.stripeProjectWebhookSecret);
   } catch {
     throw new Error("Invalid webhook signature");
   }

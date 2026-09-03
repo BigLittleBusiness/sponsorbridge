@@ -1,0 +1,9 @@
+[Unit]
+Description=SponsorBridge daily onboarding scheduler
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/opt/sponsorbridge/ops/.env.production
+ExecStart=/usr/bin/docker compose --env-file /opt/sponsorbridge/ops/.env.production -f /opt/sponsorbridge/docker-compose.production.yml exec -T app wget -qO- --post-data= --header=X-SponsorBridge-Scheduler-Secret:${SCHEDULER_SECRET} http://127.0.0.1:3000/api/scheduled/onboarding

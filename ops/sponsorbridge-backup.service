@@ -1,0 +1,8 @@
+[Unit]
+Description=SponsorBridge MySQL backup
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/sponsorbridge/ops/backup-sponsorbridge.sh

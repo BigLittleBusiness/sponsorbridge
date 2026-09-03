@@ -15,10 +15,12 @@
  */
 
 import type { Request, Response } from "express";
+import { timingSafeEqual } from "crypto";
 import { eq } from "drizzle-orm";
 import { getDb } from "../db";
 import { sponsorships, surveys } from "../../drizzle/schema";
 import { sdk } from "../_core/sdk";
+import { ENV } from "../_core/env";
 
 const ONBOARDING_STEPS = [
   { day: 1, type: "welcome", subject: "Welcome to SponsorBridge — your journey starts today", field: "onboardingDay1SentAt" as const },
@@ -29,10 +31,21 @@ const ONBOARDING_STEPS = [
   { day: 90, type: "milestone_nps", subject: "3 months together — a milestone to celebrate", field: "onboardingDay90SentAt" as const },
 ] as const;
 
+function hasValidHostedSchedulerSecret(req: Request) {
+  const provided = req.header("x-sponsorbridge-scheduler-secret");
+  const expected = ENV.schedulerSecret;
+  if (!provided || !expected) return false;
+
+  const providedBuffer = Buffer.from(provided);
+  const expectedBuffer = Buffer.from(expected);
+  return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
+}
+
 export async function onboardingHeartbeatHandler(req: Request, res: Response) {
   try {
-    const user = await sdk.authenticateRequest(req);
-    if (!user.isCron || !user.taskUid) {
+    const hostedScheduler = hasValidHostedSchedulerSecret(req);
+    const user = hostedScheduler ? null : await sdk.authenticateRequest(req);
+    if (!hostedScheduler && (!user?.isCron || !user.taskUid)) {
       return res.status(403).json({ error: "cron-only endpoint" });
     }
 

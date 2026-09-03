@@ -16,6 +16,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "./db";
 import { payments, sponsorships, sponsors } from "../drizzle/schema";
 import { sdk } from "./_core/sdk";
+import { ENV } from "./_core/env";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
   apiVersion: "2026-06-24.dahlia",
@@ -25,7 +26,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
 
 export async function stripeWebhookHandler(req: Request, res: Response) {
   const sig = req.headers["stripe-signature"] as string;
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
+  const webhookSecret = ENV.stripeChildWebhookSecret;
 
   let event: Stripe.Event;
 
@@ -177,7 +178,7 @@ export async function createCheckoutSessionHandler(req: Request, res: Response) 
       monthlyAmount?: number;
     };
 
-    const origin = req.headers.origin ?? "https://sponsorbridge.manus.space";
+    const origin = (ENV.appBaseUrl || req.headers.origin || "https://sponsorapp-k6ifqkyq.manus.space").replace(/\/+$/, "");
 
     // Create a Stripe Price for the monthly sponsorship amount
     const price = await stripe.prices.create({

@@ -1,6 +1,12 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("SponsorBridge core browser smoke tests", () => {
+  test("health endpoint provides an unauthenticated container liveness response", async ({ request }) => {
+    const response = await request.get("/api/health");
+    await expect(response).toBeOK();
+    await expect(response.json()).resolves.toMatchObject({ status: "ok", service: "sponsorbridge" });
+  });
+
   test("marketing page renders and validates the Early Access form", async ({ page }) => {
     await page.goto("/");
 

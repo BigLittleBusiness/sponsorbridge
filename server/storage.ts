@@ -1,7 +1,8 @@
-// Preconfigured storage helpers for Manus WebDev templates
-// Uploads via Forge Server presigned URL to S3 (PUT direct).
-// Downloads return /manus-storage/{key} paths served via 307 redirect.
+// Storage helpers support the existing Manus Forge adapter and a portable
+// S3-compatible adapter for self-hosted and third-party deployments.
 
+import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { ENV } from "./_core/env";
 
 function getForgeConfig() {
@@ -17,6 +18,17 @@ function getForgeConfig() {
   return { forgeUrl: forgeUrl.replace(/\/+$/, ""), forgeKey };
 }
 
+function getS3Config() {
+  const { s3Endpoint, s3Region, s3Bucket, s3AccessKeyId, s3SecretAccessKey } = ENV;
+  if (!s3Bucket || !s3AccessKeyId || !s3SecretAccessKey) {
+    throw new Error(
+      "S3 storage config missing: set S3_BUCKET, S3_ACCESS_KEY_ID, and S3_SECRET_ACCESS_KEY",
+    );
+  }
+
+  return { s3Endpoint, s3Region, s3Bucket, s3AccessKeyId, s3SecretAccessKey };
+}
+
 function normalizeKey(relKey: string): string {
   return relKey.replace(/^\/+/, "");
 }
@@ -28,15 +40,49 @@ function appendHashSuffix(relKey: string): string {
   return `${relKey.slice(0, lastDot)}_${hash}${relKey.slice(lastDot)}`;
 }
 
+let portableStorageClient: S3Client | undefined;
+
+function getPortableStorageClient() {
+  if (portableStorageClient) return portableStorageClient;
+  const config = getS3Config();
+  portableStorageClient = new S3Client({
+    region: config.s3Region,
+    endpoint: config.s3Endpoint || undefined,
+    forcePathStyle: ENV.s3ForcePathStyle,
+    credentials: {
+      accessKeyId: config.s3AccessKeyId,
+      secretAccessKey: config.s3SecretAccessKey,
+    },
+  });
+  return portableStorageClient;
+}
+
+export function isPortableStorageEnabled() {
+  return ENV.storageDriver === "s3";
+}
+
 export async function storagePut(
   relKey: string,
   data: Buffer | Uint8Array | string,
   contentType = "application/octet-stream",
 ): Promise<{ key: string; url: string }> {
-  const { forgeUrl, forgeKey } = getForgeConfig();
   const key = appendHashSuffix(normalizeKey(relKey));
 
-  // 1. Get presigned PUT URL from Forge
+  if (isPortableStorageEnabled()) {
+    const config = getS3Config();
+    await getPortableStorageClient().send(
+      new PutObjectCommand({
+        Bucket: config.s3Bucket,
+        Key: key,
+        Body: data,
+        ContentType: contentType,
+        CacheControl: "private, max-age=0, no-store",
+      }),
+    );
+    return { key, url: `/media/${key}` };
+  }
+
+  const { forgeUrl, forgeKey } = getForgeConfig();
   const presignUrl = new URL("v1/storage/presign/put", forgeUrl + "/");
   presignUrl.searchParams.set("path", key);
 
@@ -52,7 +98,6 @@ export async function storagePut(
   const { url: s3Url } = (await presignResp.json()) as { url: string };
   if (!s3Url) throw new Error("Forge returned empty presign URL");
 
-  // 2. PUT file directly to S3
   const blob =
     typeof data === "string"
       ? new Blob([data], { type: contentType })
@@ -73,13 +118,21 @@ export async function storagePut(
 
 export async function storageGet(relKey: string): Promise<{ key: string; url: string }> {
   const key = normalizeKey(relKey);
-  return { key, url: `/manus-storage/${key}` };
+  return { key, url: isPortableStorageEnabled() ? `/media/${key}` : `/manus-storage/${key}` };
 }
 
 export async function storageGetSignedUrl(relKey: string): Promise<string> {
-  const { forgeUrl, forgeKey } = getForgeConfig();
   const key = normalizeKey(relKey);
+  if (isPortableStorageEnabled()) {
+    const config = getS3Config();
+    return getSignedUrl(
+      getPortableStorageClient(),
+      new GetObjectCommand({ Bucket: config.s3Bucket, Key: key }),
+      { expiresIn: 60 * 15 },
+    );
+  }
 
+  const { forgeUrl, forgeKey } = getForgeConfig();
   const getUrl = new URL("v1/storage/presign/get", forgeUrl + "/");
   getUrl.searchParams.set("path", key);
 
