@@ -470,6 +470,11 @@
 - [x] Configure separate webhook secrets for child-sponsorship and project-contribution Stripe endpoints
 - [x] Ignore BinaryLane runtime environment files so production secrets cannot be committed
 
+## Phase 53: Commit BinaryLane Deployment Work to GitHub
+- [x] Inspect branch, remotes, working tree, and remote sync state
+- [ ] Commit all outstanding intended SponsorBridge changes
+- [ ] Push the commit to GitHub and verify the remote branch is current
+
 ## Phase 40: Comparison Table Simplification
 - [x] Remove named large organisations from the comparison heading and column label
 - [x] Remove the redundant Without SponsorBridge column while preserving table styling and feature states
